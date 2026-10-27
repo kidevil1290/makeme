@@ -24,8 +24,15 @@
     - Flutter (by Dart Code) - installs Dart Automatically
 5. VS Code Optional Extensions
     - ErrorLens - shows errors inline while coding
-    - Awesome Flutter Snippers - useful flutter shortcuts
+    - Awesome Flutter Snippets - useful flutter shortcuts
 
+## One-time Emulator Setup
+1. Open Android Studio -> Virtual Device Manager
+2. Click "Create Device"
+3. Select Pixel 6 or Pixel 7
+4. Download system image API 33 or 34
+5. Click Finish
+   
 ## Optional - iOS Simulator (Mac only)
 Only needed to test on an iPhone Simulator:
 1. Xcode -> Mac App Store
@@ -38,19 +45,19 @@ Only needed to test on an iPhone Simulator:
 
 ## Setup After Cloning
 
-### Windows
+### Windows (powershell)
 ```powershell
 .\setup.ps1
 ```
 
-### Mac
+### Mac (terminal)
 ```bash
 chmod +x setup.sh
 ./setup.sh
 ```
 
 ## Running the App
-1. Open Android Studio -> Virtual Device Manager -> start your emulator
+1. Open Android Studio -> Virtual Device Manager -> start emulator
 2. In VS Code terminal:
 ```bash
 flutter run

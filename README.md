@@ -20,9 +20,9 @@
     - Check: Android SDK Command-line Tools (Accept all)
     - Check: Android Emulator
 3. Open any IDE
-4. VS Code Required Extension
+4. VS Code Required Extensions
     - Flutter (by Dart Code) - installs Dart Automatically
-    (optional)
+5. VS Code Optional Extensions
     - ErrorLens - shows errors inline while coding
     - Awesome Flutter Snippers - useful flutter shortcuts
 

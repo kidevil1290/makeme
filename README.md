@@ -8,9 +8,9 @@
 
 | Member         | GitHub       |
 |----------------|--------------|
-| Scout Peterson | @Moe175      |
+| Scout Peterson | @            |
 | Karl Fernandez | @kidevil1290 |
-| Moe Odaki      | @kodywong1   |
+| Moe Odaki      | @Moe175      |
 
 ## Prerequisites (download and install these first)
 1. Flutter SDK -> https://docs.flutter.dev/install
@@ -57,6 +57,7 @@ flutter run
 ```
 
 ## Project Structure
+```
 |-lib/ -- all Dart code lives here
     |-models/       data classes from UML diagram (no UI)
     |-screens/      full app screens/scene/pages that user navigates to
@@ -70,6 +71,7 @@ assets/
     |-sounds/
     |-sprites/
 pubspec.yaml - dependency manager
+```
 
 
 

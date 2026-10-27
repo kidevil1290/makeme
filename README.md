@@ -1,4 +1,4 @@
-# makeme
+# MakeMe
 
 
 
@@ -65,12 +65,12 @@ flutter run
     |-services/     logic, database operations, calculations
     |-utils/        constants, enums, and helper functions
     |-main.dart     app entry point
-assets/
+|-assets/
     |-fonts/
     |-images/
     |-sounds/
     |-sprites/
-pubspec.yaml - dependency manager
+|-pubspec.yaml - dependency manager
 ```
 
 

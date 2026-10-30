@@ -6,11 +6,11 @@
 
 ## Team Members
 
-| Member         | GitHub       |
-|----------------|--------------|
-| Scout Peterson | @            |
-| Karl Fernandez | @kidevil1290 |
-| Moe Odaki      | @Moe175      |
+| Member         | GitHub        |
+|----------------|---------------|
+| Scout Peterson | @ScoutPeterson|
+| Karl Fernandez | @kidevil1290  |
+| Moe Odaki      | @Moe175       |
 
 ## Prerequisites (download and install these first)
 1. Flutter SDK -> https://docs.flutter.dev/install

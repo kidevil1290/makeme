@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget
               child: Column(mainAxisSize: MainAxisSize.min,
                 children: [ElevatedButton(onPressed: () => manager.setScreen(Screens.habitlogger),
                 child: const Text('Habit Logger'),), const SizedBox(height: 12),
-                ElevatedButton(onPressed: () => manager.setScreen(Screens.avatarEditor),
+                ElevatedButton(onPressed: () => manager.setScreen(Screens.notImplemented),
                 child: const Text('Avatar Editor')
               )],
             ),

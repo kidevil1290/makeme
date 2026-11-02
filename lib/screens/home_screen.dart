@@ -18,10 +18,10 @@ class HomeScreen extends StatelessWidget
           title: const Text('Home Screen')),
             body: Center(
               child: Column(mainAxisSize: MainAxisSize.min,
-                children: [ElevatedButton(onPressed: () => manager.setScreen(Screens.habitlogger),
+                children: [ElevatedButton(onPressed: () => manager.setScreen(Screens.habitLogger),
                 child: const Text('Habit Logger'),), const SizedBox(height: 12),
                 ElevatedButton(onPressed: () => manager.setScreen(Screens.notImplemented),
-                child: const Text('Avatar Editor')
+                child: const Text('Avatar Specification'),
               )],
             ),
           ),

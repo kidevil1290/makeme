@@ -11,6 +11,7 @@ class ScreenManager extends ChangeNotifier {
 
   void setScreen(Screens screen) {
     if (screen == _currentScreen) return;
+    _screenHistory.add(_currentScreen);
     _currentScreen = screen;
     notifyListeners();
   }

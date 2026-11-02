@@ -1,4 +1,4 @@
 enum Screens
 {
-  login, home, habitlogger, avatarEditor
+  login, home, habitlogger, avatarEditor, notImplemented
 }

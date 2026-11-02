@@ -69,8 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: GestureDetector(
         onTap: () {
           setState(() => _selectedTab = index);
-          // TODO: switch screens here, e.g.
-          // context.read<ScreenManager>().setScreen(Screens.workouts);
+          // TODO: switch screens 
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -115,8 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontSize: 16, color: Colors.black54),
         ),
         const SizedBox(height: 32),
-        // Placeholder until you add a real image to assets/
-        // Replace the Icon with: Image.asset('assets/workout.png', height: 240)
+        // Placeholder until adding avatar to assets/
+        // Replace the Icon 
         Container(
           width: 220,
           height: 220,

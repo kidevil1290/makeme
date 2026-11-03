@@ -36,7 +36,7 @@ class LoginScreen extends StatelessWidget
                 width: double.infinity,
                 height: 68,
                 child: ElevatedButton(
-                  onPressed: () => manager.setScreen(Screens.habitlogger),
+                  onPressed: () => manager.setScreen(Screens.home),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _buttonBlue,
                     foregroundColor: Colors.white,

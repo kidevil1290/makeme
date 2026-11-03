@@ -24,4 +24,12 @@ class UserProfile extends ChangeNotifier {
       skinTone: skinTone);
     notifyListeners();
   }
+
+  void addGrowth(BodyPartName part, double amount){
+    final current = _avatar;
+    if(current == null) return;
+
+    _avatar = current.addGrowth(part, amount);
+    notifyListeners();
+  }
 }

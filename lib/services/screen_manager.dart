@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../utils/enums.dart';
 
 class ScreenManager extends ChangeNotifier {
-  Screens _currentScreen = Screens.login;
+  Screens _currentScreen = Screens.home;
   final List<Screens> _screenHistory = [];
 
   Screens get currentScreen => _currentScreen;

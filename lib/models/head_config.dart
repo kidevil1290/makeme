@@ -1,25 +1,31 @@
 import '../utils/enums.dart';
 
 class HeadConfig{
-  final int eyes;
-  final int nose;
-  final int mouth;
-  final int hair;
+  final int _eyes;
+  final int _nose;
+  final int _mouth;
+  final int _hair;
 
 
 const HeadConfig({
-  this.eyes = 0,
-  this.nose = 0,
-  this.mouth = 0,
-  this.hair = 0 
+  this._eyes = 0,
+  this._nose = 0,
+  this._mouth = 0,
+  this._hair = 0,
 });
 
+int get eyes => _eyes;
+int get nose => _nose;
+int get mouth => _mouth;
+int get hair => _hair;
+
+//
 HeadConfig copyWith({int? eyes, int? nose, int? mouth, int? hair}){
   return HeadConfig(
-    eyes: eyes ?? this.eyes,
-    nose: nose ?? this.nose,
-    mouth: mouth ?? this.mouth,
-    hair: hair ?? this.hair,
+    eyes: eyes ?? _eyes,
+    nose: nose ?? _nose,
+    mouth: mouth ?? _mouth,
+    hair: hair ?? _hair,
   );
 }
 

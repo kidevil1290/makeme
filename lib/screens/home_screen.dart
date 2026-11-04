@@ -71,9 +71,11 @@ class _HomeScreenState extends State<HomeScreen> {
       child: GestureDetector(
         onTap: () {
           setState(() => _selectedTab = index);
-
+          if (index == 0) {
+            context.read<ScreenManager>().setScreen(Screens.login);
+          }
           final Screens target = switch (index){
-            0 => Screens.home,
+            0 => Screens.login,
             1 => Screens.notImplemented,
             _ => Screens.notImplemented,
           };

@@ -1,5 +1,7 @@
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/screen_manager.dart';
+import '../utils/enums.dart';
 
 
 class SignupScreen extends StatefulWidget {
@@ -21,10 +23,31 @@ class SignupScreen extends StatefulWidget {
       _confirmController.dispose();
       super.dispose();
   }
+  
 
-  @override
+@override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
-  } 
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.read<ScreenManager>().setScreen(Screens.login),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Not Implemented Yet',
+            style: TextStyle(fontSize: 22,
+            fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 50),
+             Image.asset('assets/images/notImplemented.png', height: 400, ), 
+          ],
+        )      
+        )
+    );
+  }
 }

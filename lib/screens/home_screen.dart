@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/screen_manager.dart';
+import '../utils/enums.dart';
 
-class HomeScreen extends StatefulWidget 
-{
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
- 
+
 class _HomeScreenState extends State<HomeScreen> {
   static const Color _navy = Color(0xFF1F2F66);
   static const Color _blue = Color(0xFF3F63B8);
   static const Color _paleBlue = Color(0xFFDCE6F8);
- 
+
   int _selectedTab = 0;
- 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: _navy,
         foregroundColor: Colors.white,
         title: const Text(
-          'Home',
+          'MakeMe',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         toolbarHeight: 72,
@@ -40,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
- 
+
   // The white bar with Home / Workouts / Stats
   Widget _buildTabBar() {
     return Container(
@@ -56,20 +58,26 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           _buildTab(0, Icons.home_outlined, 'Home'),
-          _buildTab(1, Icons.fitness_center, 'Workouts'),
+          _buildTab(1, Icons.edit_note, 'Loggers'),
           _buildTab(2, Icons.bar_chart, 'Stats'),
         ],
       ),
     );
   }
- 
+
   Widget _buildTab(int index, IconData icon, String label) {
     final bool selected = _selectedTab == index;
     return Expanded(
       child: GestureDetector(
         onTap: () {
           setState(() => _selectedTab = index);
-          // TODO: switch screens 
+
+          final Screens target = switch (index){
+            0 => Screens.home,
+            1 => Screens.notImplemented,
+            _ => Screens.notImplemented,
+          };
+          context.read<ScreenManager>().setScreen(target);
         },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
@@ -94,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
- 
+
   // Title, subtitle and the illustration
   Widget _buildHeroSection() {
     return Column(
@@ -115,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 32),
         // Placeholder until adding avatar to assets/
-        // Replace the Icon 
+        // Replace the Icon
         Container(
           width: 220,
           height: 220,
@@ -128,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
     );
   }
- 
+
   Widget _buildStartButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -157,4 +165,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
- 

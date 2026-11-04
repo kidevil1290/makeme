@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/avatar_editor.dart';
+import 'models/user_profile.dart';
+import 'screens/avatar_specs.dart';
 import 'screens/habit_logger.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -14,8 +15,11 @@ class MakeMeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ScreenManager(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ScreenManager()),
+        ChangeNotifierProvider(create: (_) => UserProfile())
+      ],
       child: MaterialApp(
         title: 'MakeMe',
         debugShowCheckedModeBanner: false,
@@ -37,8 +41,8 @@ class MakeMeApp extends StatelessWidget {
                   child: switch (manager.currentScreen) {
                     Screens.login => const LoginScreen(),
                     Screens.home => const HomeScreen(),
-                    Screens.habitlogger => const HabitLogger(),
-                    Screens.avatarEditor => const AvatarEditor(),
+                    Screens.habitLogger => const HabitLogger(),
+                    Screens.avatarSpecs => const AvatarSpecs(),
                     Screens.notImplemented => const NotImplemented(),
                   },
                 ),

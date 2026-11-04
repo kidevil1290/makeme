@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/screen_manager.dart';
-import '../utils/enums.dart';
 
-class AvatarEditor extends StatelessWidget 
+class AvatarSpecs extends StatelessWidget 
 {
-  const AvatarEditor({super.key});
+  const AvatarSpecs({super.key});
 
   @override
   Widget build(BuildContext context) 
@@ -13,11 +12,11 @@ class AvatarEditor extends StatelessWidget
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blue,
-        title: const Text('Avatar Editor'),),
+        title: const Text('Avatar Specification'),),
       body: Center(
         child: ElevatedButton(
-          onPressed: () => context.read<ScreenManager>().setScreen(Screens.home),
-            child: const Text('Back to Home'),
+          onPressed: () => context.read<ScreenManager>().goBack(),
+            child: const Text('Back'),
         )
       ),
     );

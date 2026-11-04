@@ -1,4 +1,30 @@
-enum Screens
+enum Screens { login, home, habitLogger, avatarSpecs, notImplemented }
+
+enum Gender { male, female }
+
+enum BuildType { skinny, average, athletic, heavy }
+
+enum HeadPart
 {
-  login, home, habitlogger, avatarEditor, notImplemented
+  hair(3),
+  eyes(3),
+  nose(3),
+  mouth(3);
+
+  final int optionCount;
+  const HeadPart(this.optionCount);
 }
+
+enum BodyPartName {
+  head,
+  chest,
+  back,
+  shoulders,
+  biceps,
+  triceps,
+  forearms,
+  core,
+  legs,
+}
+
+enum Intensity { light, medium, heavy }

@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/screen_manager.dart';
 import '../utils/enums.dart';
+import 'package:makeme/theme/theme.dart';
 
 class LoginScreen extends StatelessWidget
 {
   const LoginScreen({super.key});
-
-  static const _bg = Color(0xFFF4F7FD);
-  static const _buttonBlue = Color(0xFF3F6FD8);
  
   @override
   Widget build(BuildContext context) {
     final manager = context.read<ScreenManager>();
  
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppColors.white,
       body: SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(32, 12, 32, 40),
@@ -25,10 +23,10 @@ class LoginScreen extends StatelessWidget
             Align(
               alignment: Alignment.centerRight,
               child: OutlinedButton(
-                onPressed: () => manager.setScreen(Screens.signup),
+                onPressed: () => manager.setScreen(Screens.notImplemented),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: _buttonBlue,
-                  side: const BorderSide(color: _buttonBlue, width: 1.5),
+                  foregroundColor: AppColors.buttonBlue,
+                  side: const BorderSide(color: AppColors.buttonBlue, width: 1.5),
                   shape: const StadiumBorder(),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
@@ -57,10 +55,10 @@ class LoginScreen extends StatelessWidget
                 child: ElevatedButton(
                   onPressed: () => manager.setScreen(Screens.home),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _buttonBlue,
+                    backgroundColor: AppColors.buttonBlue,
                     foregroundColor: Colors.white,
                     elevation: 4,
-                    shadowColor: _buttonBlue.withOpacity(0.4),
+                    shadowColor: AppColors.buttonBlue.withOpacity(0.4),
                     shape: const StadiumBorder(),
                   ),
                   child: const Row(

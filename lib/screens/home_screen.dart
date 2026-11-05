@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/screen_manager.dart';
 import '../utils/enums.dart';
+import 'package:makeme/theme/theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,10 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F6FC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: _navy,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.header,
+        foregroundColor: AppColors.white,
         title: const Text(
           'MakeMe',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),

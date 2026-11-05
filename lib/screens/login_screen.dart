@@ -1,48 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import '../services/screen_manager.dart';
 import '../utils/enums.dart';
+import 'package:makeme/theme/theme.dart';
 
 class LoginScreen extends StatelessWidget
 {
   const LoginScreen({super.key});
-
-  static const _bg = Color(0xFFF4F7FD);
-  static const _buttonBlue = Color(0xFF3F6FD8);
  
   @override
   Widget build(BuildContext context) {
     final manager = context.read<ScreenManager>();
  
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(32, 0, 32, 40),
-          child: Column(
-            children: [
-              // Illustration
-              Expanded(
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 320 / 240,
-                  ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(32, 12, 32, 40),
+        child: Column(
+          children: [
+            // Sign up button (top)
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton(
+                onPressed: () => manager.setScreen(Screens.notImplemented),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.buttonBlue,
+                  side: const BorderSide(color: AppColors.buttonBlue, width: 1.5),
+                  shape: const StadiumBorder(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                ),
+                child: const Text(
+                  'Sign up',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
+            ),
+
+            // Illustration
+            Expanded(
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: 320 / 240,
+                  child: CustomPaint(painter: _StretchIllustrationPainter()),
+                ),
+              ),
+            ),
  
               // Start button
               SizedBox(
                 width: double.infinity,
-                height: 68,
+                height: 64,
                 child: ElevatedButton(
                   onPressed: () => manager.setScreen(Screens.home),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _buttonBlue,
-                    foregroundColor: Colors.white,
-                    elevation: 4,
-                    shadowColor: _buttonBlue.withOpacity(0.4),
-                    shape: const StadiumBorder(),
+                    backgroundColor: AppColors.blue,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -67,5 +83,16 @@ class LoginScreen extends StatelessWidget
       ),
     );
   }
+}
+
+class _StretchIllustrationPainter extends CustomPainter
+{
+  @override
+  void paint(Canvas canvas, Size size) {
+    // drawing code
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
  

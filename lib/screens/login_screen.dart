@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget
     final manager = context.read<ScreenManager>();
  
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(32, 12, 32, 40),
@@ -51,15 +51,14 @@ class LoginScreen extends StatelessWidget
               // Start button
               SizedBox(
                 width: double.infinity,
-                height: 68,
+                height: 64,
                 child: ElevatedButton(
                   onPressed: () => manager.setScreen(Screens.home),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.buttonBlue,
-                    foregroundColor: Colors.white,
-                    elevation: 4,
-                    shadowColor: AppColors.buttonBlue.withOpacity(0.4),
-                    shape: const StadiumBorder(),
+                    backgroundColor: AppColors.blue,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -9,3 +9,7 @@ class AppColors {
   static const background = Color(0xFFDCE6F8);//paleblue
 
 }
+
+class AppTheme{
+  //Add typography(button, header size spacing etc.)
+}

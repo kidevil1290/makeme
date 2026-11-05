@@ -12,9 +12,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  static const Color _navy = Color(0xFF1F2F66);
-  static const Color _blue = Color(0xFF3F63B8);
-  static const Color _paleBlue = Color(0xFFDCE6F8);
 
   int _selectedTab = 0;
 
@@ -85,18 +82,18 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? _paleBlue : Colors.transparent,
+            color: selected ? AppColors.background : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             children: [
-              Icon(icon, size: 30, color: selected ? _blue : _navy),
+              Icon(icon, size: 30, color: selected ? AppColors.blue : AppColors.background),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: selected ? _blue : _navy,
+                  color: selected ? AppColors.blue : AppColors.background,
                 ),
               ),
             ],
@@ -110,36 +107,10 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHeroSection() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Text(
-          'Work Out',
-          style: TextStyle(
-            fontSize: 44,
-            fontWeight: FontWeight.w800,
-            color: _navy,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Move, Train, and Stay Healthy!',
-          style: TextStyle(fontSize: 16, color: Colors.black54),
-        ),
-        const SizedBox(height: 32),
-        // Placeholder until adding avatar to assets/
-        // Replace the Icon
-        Container(
-          width: 220,
-          height: 220,
-          decoration: const BoxDecoration(
-            color: _paleBlue,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.self_improvement, size: 120, color: _blue),
-        ),
-      ],
     );
   }
 
+//start button on the bottom
   Widget _buildStartButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -147,12 +118,10 @@ class _HomeScreenState extends State<HomeScreen> {
         width: double.infinity,
         height: 64,
         child: ElevatedButton.icon(
-          onPressed: () {
-            // TODO: go to the workout screen
-          },
+          onPressed: () => context.read<ScreenManager>().setScreen(Screens.notImplemented),
           style: ElevatedButton.styleFrom(
-            backgroundColor: _blue,
-            foregroundColor: Colors.white,
+            backgroundColor: AppColors.blue,
+            foregroundColor: AppColors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(32),
             ),

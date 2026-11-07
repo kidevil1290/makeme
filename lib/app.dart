@@ -9,6 +9,7 @@ import 'screens/login_screen.dart';
 import 'screens/not_implemented.dart';
 import 'services/screen_manager.dart';
 import 'utils/enums.dart';
+import 'theme/theme.dart';
 
 class MakeMeApp extends StatelessWidget {
   const MakeMeApp({super.key});
@@ -18,15 +19,12 @@ class MakeMeApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ScreenManager()),
-        ChangeNotifierProvider(create: (_) => UserProfile())
+        ChangeNotifierProvider(create: (_) => UserProfile()),
       ],
       child: MaterialApp(
         title: 'MakeMe',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-          useMaterial3: true,
-        ),
+        theme: AppTheme.light,
         home: Consumer<ScreenManager>(
           builder: (context, manager, _) {
             return PopScope(

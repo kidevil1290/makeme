@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../utils/enums.dart';
 
 class ScreenManager extends ChangeNotifier {
-  Screens _currentScreen = Screens.home;
+  Screens _currentScreen = Screens.login;
   final List<Screens> _screenHistory = [];
 
   Screens get currentScreen => _currentScreen;
@@ -17,7 +17,7 @@ class ScreenManager extends ChangeNotifier {
   }
 
   void goBack() {
-    if(_screenHistory.isEmpty) return;
+    if (_screenHistory.isEmpty) return;
     _currentScreen = _screenHistory.removeLast();
     notifyListeners();
   }

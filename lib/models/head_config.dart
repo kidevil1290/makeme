@@ -18,7 +18,7 @@ class HeadConfig {
   int get mouth => _mouth;
   int get hair => _hair;
 
-  //
+  // Copy with some parts changed, parts left out will keep their value
   HeadConfig copyWith({int? eyes, int? nose, int? mouth, int? hair}) {
     return HeadConfig(
       eyes: eyes ?? _eyes,
@@ -28,6 +28,7 @@ class HeadConfig {
     );
   }
 
+  // Generic way to read any face part's option
   int optionFor(HeadPart part) {
     return switch (part) {
       HeadPart.eyes => eyes,
@@ -36,7 +37,7 @@ class HeadConfig {
       HeadPart.hair => hair,
     };
   }
-
+  // Returns a new HeadConfig with the given part changed to the given option.
   HeadConfig withOption(HeadPart part, int option) {
     return switch (part) {
       HeadPart.eyes => copyWith(eyes: option),

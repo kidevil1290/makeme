@@ -4,6 +4,7 @@ import '../utils/enums.dart';
 import '../models/avatar.dart';
 import '../utils/asset_paths.dart';
 
+// Draws an Avatar by stacking same-size transparent PNG layers
 class AvatarDisplay extends StatelessWidget {
   final Avatar avatar;
   final double width;
@@ -16,6 +17,7 @@ class AvatarDisplay extends StatelessWidget {
     this.height = 400,
   });
 
+  // One full size layer. A missing file draws nothing instead of crashing
   Widget _layer(String path, [double opacity = 1.0]) {
     return Positioned.fill(
       child: Opacity(
@@ -29,6 +31,8 @@ class AvatarDisplay extends StatelessWidget {
     );
   }
 
+  // Layers for one muscle.
+  // Uses opacity layering for stages 0, 2 and 4
   List<Widget> _muscle(BodyPartName part) {
     final double growth = avatar.growthOf(part);
 
@@ -43,6 +47,7 @@ class AvatarDisplay extends StatelessWidget {
     ];
   }
 
+// The "..." unpacks each muscle's list of layers into this Stack
   @override
   Widget build(BuildContext context) {
     return SizedBox(

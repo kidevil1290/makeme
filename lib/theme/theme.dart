@@ -9,9 +9,9 @@ class AppColors {
   static const background = Color(0xFFDCE6F8); //paleblue
 }
 
+// Builds the ThemeData given to MaterialApp
+// Widgets pick up their design from here unless overriden in screen
 class AppTheme {
-  //Add typography(button, header size spacing etc.)
-
   static const AppBarTheme _appBar = AppBarTheme(
     backgroundColor: AppColors.header,
     foregroundColor: AppColors.white,
@@ -33,6 +33,8 @@ class AppTheme {
     seedColor: AppColors.blue,
     primary: AppColors.blue,
   );
+
+  // New theme design goes here and add into ThemeData parameter
 
   static ThemeData get light {
     return ThemeData(

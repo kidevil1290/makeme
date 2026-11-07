@@ -1,10 +1,12 @@
 import 'enums.dart';
 
+// Builds every sprite file path in one place
+// screens dont need to type paths
 class AssetPaths {
   AssetPaths._();
 
   static const String _root = 'assets/sprites';
-  //the order for layering
+  // The order for layering. back to front
   static const List<BodyPartName> bodyOrder = [
     BodyPartName.back,
     BodyPartName.legs,
@@ -21,7 +23,7 @@ class AssetPaths {
     return '$_root/${part.name}_$option.png';
   }
 
-  // e.g. assets/sprites/male_atheletic_head.png
+  // e.g. assets/sprites/male_athletic_head.png
   static String head(Gender gender, BuildType build) {
     return '$_root/${gender.name}_${build.name}_head.png';
   }

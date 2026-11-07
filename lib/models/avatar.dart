@@ -1,7 +1,10 @@
 import '../utils/enums.dart';
 import 'head_config.dart';
 
+// Immutable snapshot of the user's avatar. Methods like addGrowth return a 
+// NEW Avatar, and UserProfile stores it and tells the UI to redraw it.
 class Avatar {
+  // Max growth a muscle can reach
   static const double maxGrowth = 4.0;
 
   final Gender gender;
@@ -11,7 +14,7 @@ class Avatar {
 
   final Map<BodyPartName, double> muscleGrowth;
 
-  //does not construct without all required data
+  // Does not construct without all required data
   const Avatar({
     required this.gender,
     required this.build,
@@ -20,10 +23,10 @@ class Avatar {
     this.muscleGrowth = const {},
   });
 
-  //returns the muscles growth
+  // Returns the muscles growth
   double growthOf(BodyPartName part) => muscleGrowth[part] ?? 0.0;
 
-  //retains avatar specs and adds creates a new Map of muscleGrowth
+  // Copy of this avatar with the growth map replaced
   Avatar copyWith({Map<BodyPartName, double>? muscleGrowth}) {
     return Avatar(
       gender: gender,
@@ -34,7 +37,7 @@ class Avatar {
     );
   }
 
-  //adds the body parts muscle growth
+  // Adds the body parts muscle growth
   Avatar addGrowth(BodyPartName part, double amount) {
     final double next = (growthOf(part) + amount)
         .clamp(0.0, maxGrowth)

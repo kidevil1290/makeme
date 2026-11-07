@@ -1,11 +1,10 @@
-enum Screens { login, home, habitLogger, avatarSpecs, notImplemented}
+enum Screens { login, home, habitLogger, avatarSpecs, notImplemented }
 
 enum Gender { male, female }
 
 enum BuildType { skinny, average, athletic, heavy }
 
-enum HeadPart
-{
+enum HeadPart {
   hair(3),
   eyes(3),
   nose(3),

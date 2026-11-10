@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 64,
         child: ElevatedButton.icon(
           onPressed: () =>
-              context.read<ScreenManager>().setScreen(Screens.notImplemented),
+              context.read<ScreenManager>().setScreen(Screens.habitLogger),
           icon: const Icon(Icons.play_arrow),
           label: const Text(
             'Start Workout',

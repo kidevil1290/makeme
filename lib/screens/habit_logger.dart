@@ -34,7 +34,8 @@ class HabitLogger extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _HabitButton(
-                label: 'Hydration Log',                onPressed: () => manager.setScreen(Screens.notImplemented),
+                label: 'Hydration Log',                
+                onPressed: () => manager.setScreen(Screens.notImplemented),
               ),
               const SizedBox(height: 16),
               _HabitButton(

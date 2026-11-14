@@ -16,17 +16,23 @@ class UserProfile extends ChangeNotifier {
   // Writes only once: does nothing if an avatar already exists
   // Meant to be called once, when avatar creation is finished
   void createAvatar({
+    required String avatarName,
+    required int weeklyGoal,
     required Gender gender,
     required BuildType build,
     required HeadConfig head,
-    required double skinTone,
+    required Color skinColor,
+    required Color hairColor,
   }) {
     if (_avatar != null) return;
     _avatar = Avatar(
+      avatarName: avatarName,
+      weeklyGoal: weeklyGoal,
       gender: gender,
       build: build,
       head: head,
-      skinTone: skinTone,
+      skinColor: skinColor,
+      hairColor: hairColor,
     );
     notifyListeners();
   }

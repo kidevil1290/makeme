@@ -46,3 +46,16 @@ class AppTheme {
     );
   }
 }
+
+class NoOverscroll extends MaterialScrollBehavior {
+  const NoOverscroll();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) {
+    return child;
+  }
+}

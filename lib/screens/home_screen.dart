@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final Screens target = switch (index) {
             0 => Screens.home,
             1 => Screens.notImplemented,
-            _ => Screens.notImplemented,
+            _ => Screens.avatarCreation,
           };
           context.read<ScreenManager>().setScreen(target);
         },

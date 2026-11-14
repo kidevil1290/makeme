@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedTab = index);
           final Screens target = switch (index) {
             0 => Screens.home,
-            1 => Screens.notImplemented,
+            1 => Screens.habitLogger,
             _ => Screens.notImplemented,
           };
           context.read<ScreenManager>().setScreen(target);
@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
         height: 64,
         child: ElevatedButton.icon(
           onPressed: () =>
-              context.read<ScreenManager>().setScreen(Screens.notImplemented),
+              context.read<ScreenManager>().setScreen(Screens.workoutlog),
           icon: const Icon(Icons.play_arrow),
           label: const Text(
             'Start Workout',

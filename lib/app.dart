@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:makeme/screens/workout_template.dart';
+import 'package:makeme/screens/workoutlog_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'models/user_profile.dart';
@@ -50,6 +52,8 @@ class MakeMeApp extends StatelessWidget {
                     Screens.habitLogger => const HabitLogger(),
                     Screens.avatarSpecs => const AvatarSpecs(),
                     Screens.notImplemented => const NotImplemented(),
+                    Screens.workoutlog =>  const WorkoutLog(),
+                    Screens.template => const WorkoutTemplate(),
                   },
                 ),
               ),

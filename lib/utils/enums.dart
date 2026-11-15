@@ -1,4 +1,10 @@
-enum Screens { login, home, habitLogger, avatarSpecs, notImplemented }
+enum Screens { login, 
+                home, 
+                habitLogger, 
+                avatarSpecs, 
+                notImplemented, 
+                workoutlog, 
+                template}
 
 enum Gender { male, female }
 

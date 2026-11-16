@@ -48,7 +48,7 @@ class Avatar {
     );
   }
 
-  // Returns a new Avatar with amount added to one muscle kept between 0 to max
+  // Returns a new Avatar with amount added to one muscle kept between 0 and max
   Avatar addGrowth(BodyPartName part, double amount) {
     final double next = (growthOf(part) + amount)
         .clamp(0.0, maxGrowth)

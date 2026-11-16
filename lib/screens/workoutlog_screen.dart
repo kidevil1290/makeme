@@ -85,7 +85,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
         title: const Text('Workout Log'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => manager.setScreen(Screens.home),
+          onPressed: () => manager.goBack(),
         ),
       ),
       body: SafeArea(

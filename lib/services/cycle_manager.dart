@@ -16,7 +16,7 @@ class CycleManager {
     _canAscend = false;
   }
 
-  // Calculates how many days have elapsed since _cycleStart
+  // Calculates how many whole days have elapsed since _cycleStart
   int daysElapsed([DateTime? now]) {
     final start = _cycleStart;
     if (start == null) return 0;

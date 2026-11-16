@@ -19,7 +19,7 @@ class HabitLogger extends StatelessWidget {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => manager.setScreen(Screens.home),
+          onPressed: () => manager.goBack(),
         ),
       ),
       body: SafeArea(

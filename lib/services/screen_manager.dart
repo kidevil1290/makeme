@@ -4,30 +4,30 @@ import '../utils/enums.dart';
 
 // Decides which screen is showing.
 // screens call setScreen() to navigate
-// app.dart watch this class and swaps the screen
+// app.dart watches this class and swaps the screen
 class ScreenManager extends ChangeNotifier {
   Screens _currentScreen = Screens.login;
-  // List of screens we came from, used for the back button to return to
-  // might delete
-  final List<Screens> _screenHistory = [];
+  Screens? _previousScreen;
 
   Screens get currentScreen => _currentScreen;
-  bool get canGoBack => _screenHistory.isNotEmpty;
 
   // Switches the screen and remembers the one we left
   void setScreen(Screens screen) {
     if (screen == _currentScreen) return;
-    _screenHistory.add(_currentScreen);
+    _previousScreen = currentScreen;
     _currentScreen = screen;
     notifyListeners();
   }
 
-  // Returns to the previous screen or does nothing if there is none
+  // Goes back one previous screen, or to home if there is none.
+  // Does nothing on home and log in screen to protect app closing on stray back gestures
   // Used for the android back button
-  // might delete
   void goBack() {
-    if (_screenHistory.isEmpty) return;
-    _currentScreen = _screenHistory.removeLast();
+    if (_currentScreen == Screens.home || _currentScreen == Screens.login) {
+      return;
+    }
+    _currentScreen = _previousScreen ?? Screens.home;
+    _previousScreen = null;
     notifyListeners();
   }
 }

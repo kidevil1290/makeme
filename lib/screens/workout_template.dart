@@ -16,7 +16,7 @@ class WorkoutTemplate extends StatelessWidget {
         title: const Text('Workout template'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => manager.setScreen(Screens.workoutlog),
+          onPressed: () => manager.goBack(),
         ),
       ),
     );

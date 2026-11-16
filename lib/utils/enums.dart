@@ -3,6 +3,7 @@ enum Screens {
   home,
   habitLogger,
   avatarCreation,
+  avatarSelection,
   notImplemented,
   workoutlog,
   template,

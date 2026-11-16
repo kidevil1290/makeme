@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:makeme/screens/workout_template.dart';
-import 'package:makeme/screens/workoutlog_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'models/user_profile.dart';
@@ -9,6 +7,9 @@ import 'screens/habit_logger.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/not_implemented.dart';
+import 'screens/avatar_selection.dart';
+import 'screens/workout_template.dart';
+import 'screens/workoutlog_screen.dart';
 import 'services/screen_manager.dart';
 import 'utils/enums.dart';
 import 'theme/theme.dart';
@@ -33,10 +34,9 @@ class MakeMeApp extends StatelessWidget {
         // Rebuilds whenever ScreenManager changes screen
         home: Consumer<ScreenManager>(
           builder: (context, manager, _) {
-            // Used for Android back button to go back to previous screen
-            // might delete
+            // Stops the system back gesture from closing the app and sends it to screenManager.goBack()
             return PopScope(
-              canPop: !manager.canGoBack,
+              canPop: false,
               onPopInvokedWithResult: (didPop, _) {
                 if (!didPop) manager.goBack();
               },
@@ -46,7 +46,7 @@ class MakeMeApp extends StatelessWidget {
                 child: KeyedSubtree(
                   key: ValueKey(manager.currentScreen),
                   // One case per Screens value.
-                  // All screen enum values needs a case here
+                  // All screen enum value needs a case
                   child: switch (manager.currentScreen) {
                     Screens.login => const LoginScreen(),
                     Screens.home => const HomeScreen(),
@@ -55,6 +55,7 @@ class MakeMeApp extends StatelessWidget {
                     Screens.notImplemented => const NotImplemented(),
                     Screens.workoutlog => const WorkoutLog(),
                     Screens.template => const WorkoutTemplate(),
+                    Screens.avatarSelection => const AvatarSelection(),
                   },
                 ),
               ),

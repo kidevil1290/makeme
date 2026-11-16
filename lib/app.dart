@@ -53,7 +53,7 @@ class MakeMeApp extends StatelessWidget {
                     Screens.habitLogger => const HabitLogger(),
                     Screens.avatarCreation => const AvatarCreation(),
                     Screens.notImplemented => const NotImplemented(),
-                    Screens.workoutlog =>  const WorkoutLog(),
+                    Screens.workoutlog => const WorkoutLog(),
                     Screens.template => const WorkoutTemplate(),
                   },
                 ),

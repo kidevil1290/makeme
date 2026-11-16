@@ -3,14 +3,16 @@ import 'package:flutter/material.dart';
 import 'avatar.dart';
 import '../utils/enums.dart';
 import '../models/head_config.dart';
+import '../services/cycle_manager.dart';
 
 // Owns the user's current avatar and tells the UI when it changes.
 class UserProfile extends ChangeNotifier {
   Avatar? _avatar;
+  final CycleManager _cycle = CycleManager();
 
   Avatar? get avatar => _avatar;
-
   bool get hasAvatar => _avatar != null;
+  bool get canAscend => _cycle.canAscend;
 
   // Null until avatar creation is finished
   // Writes only once: does nothing if an avatar already exists
@@ -34,6 +36,7 @@ class UserProfile extends ChangeNotifier {
       skinColor: skinColor,
       hairColor: hairColor,
     );
+    _cycle.startCycle();
     notifyListeners();
   }
 
@@ -44,6 +47,15 @@ class UserProfile extends ChangeNotifier {
     if (current == null) return;
 
     _avatar = current.addGrowth(part, amount);
+    _cycle.update(_avatar!);
+    notifyListeners();
+  }
+
+  // Ends the current avatar and resets the cycle
+  void ascend() {
+    // TODO: save avatar history here
+    _avatar = null;
+    _cycle.reset();
     notifyListeners();
   }
 }

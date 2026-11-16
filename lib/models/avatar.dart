@@ -59,4 +59,8 @@ class Avatar {
     updated[part] = next;
     return copyWith(muscleGrowth: updated);
   }
+
+  // True when every muscle has reached max growth
+  bool get isMaxed =>
+      BodyPartName.values.every((part) => growthOf(part) >= maxGrowth);
 }

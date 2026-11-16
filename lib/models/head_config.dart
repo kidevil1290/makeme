@@ -37,6 +37,7 @@ class HeadConfig {
       HeadPart.hair => hair,
     };
   }
+
   // Returns a new HeadConfig with the given part changed to the given option.
   HeadConfig withOption(HeadPart part, int option) {
     return switch (part) {

@@ -4,7 +4,7 @@ import 'package:makeme/screens/workoutlog_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'models/user_profile.dart';
-import 'screens/avatar_specs.dart';
+import 'screens/avatar_creation.dart';
 import 'screens/habit_logger.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -29,6 +29,7 @@ class MakeMeApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         // Colors and widget design comes from theme.dart
         theme: AppTheme.light,
+        scrollBehavior: const NoOverscroll(),
         // Rebuilds whenever ScreenManager changes screen
         home: Consumer<ScreenManager>(
           builder: (context, manager, _) {
@@ -50,7 +51,7 @@ class MakeMeApp extends StatelessWidget {
                     Screens.login => const LoginScreen(),
                     Screens.home => const HomeScreen(),
                     Screens.habitLogger => const HabitLogger(),
-                    Screens.avatarSpecs => const AvatarSpecs(),
+                    Screens.avatarCreation => const AvatarCreation(),
                     Screens.notImplemented => const NotImplemented(),
                     Screens.workoutlog =>  const WorkoutLog(),
                     Screens.template => const WorkoutTemplate(),

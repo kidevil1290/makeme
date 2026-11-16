@@ -1,7 +1,7 @@
 enum Screens { login, 
                 home, 
                 habitLogger, 
-                avatarSpecs, 
+                avatarCreation, 
                 notImplemented, 
                 workoutlog, 
                 template}
@@ -10,7 +10,7 @@ enum Gender { male, female }
 
 enum BuildType { skinny, average, athletic, heavy }
 
-// Face parts for the user to customize. 
+// Face parts for the user to customize.
 // Number is amount of presets which is saved into HeadPart
 enum HeadPart {
   hair(3),

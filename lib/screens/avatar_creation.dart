@@ -161,7 +161,7 @@ class _AvatarCreationState extends State<AvatarCreation> {
     );
   }
 
-  // Left column: preview, skinColor bar, name, goal
+  // Left column: preview, skinColor bar, hair color bar, name, goal
   Widget _buildPreviewColumn(Avatar preview) {
     return SizedBox(
       width: _previewWidth,
@@ -233,7 +233,7 @@ class _AvatarCreationState extends State<AvatarCreation> {
   }
 
   // Creates the avatar from the selected options,
-  // then goes back to home screen
+  // then goes to home screen
   void _save() {
     context.read<UserProfile>().createAvatar(
       avatarName: _avatarName.trim(),
@@ -270,8 +270,8 @@ class _AvatarCreationState extends State<AvatarCreation> {
     );
   }
 
-  // Returns the skin color at position t from 0.0 to 1.0
-  // on the bar by blending the two nearest colors
+  // Returns the color at position t from 0.0 to 1.0
+  // of a pallete by blending the two nearest colors
   Color _colorAt(List<Color> colors, double t) {
     final double scaled = t * (colors.length - 1);
     final int i = scaled.floor().clamp(0, colors.length - 2);
@@ -380,7 +380,7 @@ class _AvatarCreationState extends State<AvatarCreation> {
         actions: [
           ElevatedButton(
             onPressed: () =>
-                context.read<ScreenManager>().setScreen(Screens.home),
+                context.read<ScreenManager>().setScreen(Screens.avatarSelection),
             child: const Text('cancel', style: TextStyle(fontSize: 16)),
           ),
           const SizedBox(width: 10),

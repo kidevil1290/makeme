@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../utils/enums.dart';
 import '../services/screen_manager.dart';
 
 //display labels with enum
 String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+
 extension BodyPartNameLabel on BodyPartName {
   String get label => _capitalize(name);
 }
+
 extension IntensityLabel on Intensity {
   String get label => _capitalize(name);
 }
@@ -19,40 +22,40 @@ String formatDuration(int minutes) {
   if (m == 0) return '$h h';
   return '$h h $m min';
 }
-final List<int> kDurationOptions = [5, for (var m = 10; m <= 120; m += 10) m];
 
+final List<int> kDurationOptions = [5, for (var m = 10; m <= 120; m += 10) m];
 
 class WorkoutLog extends StatefulWidget {
   const WorkoutLog({super.key});
- 
+
   @override
   State<WorkoutLog> createState() => _WorkoutLogState();
 }
- 
+
 class _WorkoutLogState extends State<WorkoutLog> {
   int? _durationMinutes;
   final _durationController = TextEditingController();
   final Set<BodyPartName> _selectedBodyParts = {};
   Intensity? _intensity;
- 
+
   @override
   void initState() {
     super.initState();
     // Rebuild so the Save button enables/disables as the user types.
     _durationController.addListener(() => setState(() {}));
   }
- 
+
   @override
   void dispose() {
     _durationController.dispose();
     super.dispose();
   }
- 
+
   bool get _canSave =>
       (_durationMinutes ?? 0) > 0 &&
       _selectedBodyParts.isNotEmpty &&
       _intensity != null;
- 
+
   void _save() {
     // TODO: persist the log entry (database / API).
     final entry = (
@@ -61,37 +64,36 @@ class _WorkoutLogState extends State<WorkoutLog> {
       intensity: _intensity!,
     );
     debugPrint('Workout saved: $entry');
- 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Workout logged')),
-    );
- 
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Workout logged')));
+
     setState(() {
       _durationController.clear();
       _selectedBodyParts.clear();
       _intensity = null;
     });
   }
- 
+
   @override
   Widget build(BuildContext context) {
     final manager = context.read<ScreenManager>();
     final textTheme = Theme.of(context).textTheme;
- 
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Workout Log'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => manager.setScreen(Screens.home),
+          onPressed: () => manager.goBack(),
         ),
       ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               // 1. Duration (5 min to 2 hours)
               Text('Duration', style: textTheme.titleMedium),
               const SizedBox(height: 8),
@@ -114,7 +116,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
                 onChanged: (value) => setState(() => _durationMinutes = value),
               ),
               const SizedBox(height: 24),
-  
+
               // 2. Body parts (1 or multiple)
               Text('Body parts', style: textTheme.titleMedium),
               const SizedBox(height: 4),
@@ -141,7 +143,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
                 ],
               ),
               const SizedBox(height: 24),
-  
+
               // 3. Intensity
               Text('Intensity', style: textTheme.titleMedium),
               const SizedBox(height: 8),
@@ -163,7 +165,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
                 ),
               ),
               const SizedBox(height: 32),
-  
+
               // Save
               SizedBox(
                 height: 56,
@@ -176,7 +178,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
                 ),
               ),
               const SizedBox(height: 12),
-  
+
               // 4. Workout template
               SizedBox(
                 height: 56,
@@ -188,11 +190,10 @@ class _WorkoutLogState extends State<WorkoutLog> {
                   ),
                 ),
               ),
-              ],
-            ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
- 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:makeme/utils/enums.dart';
 import 'package:provider/provider.dart';
+
 import '../services/screen_manager.dart';
 
 class HabitLogger extends StatelessWidget {
@@ -11,11 +12,14 @@ class HabitLogger extends StatelessWidget {
     final manager = context.read<ScreenManager>();
 
     return Scaffold(
-     appBar: AppBar(
-        title: const Text('Habit log', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),),
+      appBar: AppBar(
+        title: const Text(
+          'Habit log',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => manager.setScreen(Screens.home),
+          onPressed: () => manager.goBack(),
         ),
       ),
       body: SafeArea(
@@ -34,7 +38,7 @@ class HabitLogger extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _HabitButton(
-                label: 'Hydration Log',                
+                label: 'Hydration Log',
                 onPressed: () => manager.setScreen(Screens.notImplemented),
               ),
               const SizedBox(height: 16),
@@ -51,10 +55,7 @@ class HabitLogger extends StatelessWidget {
 }
 
 class _HabitButton extends StatelessWidget {
-  const _HabitButton({
-    required this.label,
-    required this.onPressed,
-  });
+  const _HabitButton({required this.label, required this.onPressed});
 
   final String label;
   final VoidCallback onPressed;

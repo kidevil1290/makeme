@@ -57,7 +57,7 @@ class LoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 64,
                 child: ElevatedButton(
-                  onPressed: () => manager.setScreen(Screens.home),
+                  onPressed: () => manager.setScreen(Screens.avatarSelection),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

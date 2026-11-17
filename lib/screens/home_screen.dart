@@ -5,6 +5,8 @@ import '../services/screen_manager.dart';
 import '../utils/enums.dart';
 import '../theme/theme.dart';
 
+enum _ProfileAction { avatarSelection, logOut }
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -23,6 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'MakeMe',
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
+        actions: [_buildProfileMenu()],
       ),
       body: SafeArea(
         child: Column(
@@ -37,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // The white bar with Home / Workouts / Stats
+  // The white bar with Home / Loggers / Stats
   Widget _buildTabBar() {
     return Container(
       margin: const EdgeInsets.all(12),
@@ -68,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final Screens target = switch (index) {
             0 => Screens.home,
             1 => Screens.notImplemented,
-            _ => Screens.avatarCreation,
+            _ => Screens.notImplemented,
           };
           context.read<ScreenManager>().setScreen(target);
         },
@@ -105,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(mainAxisAlignment: MainAxisAlignment.center);
   }
 
-  //start button on the bottom
+  // Start button on the bottom
   Widget _buildStartButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -121,6 +124,59 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           iconAlignment: IconAlignment.end,
+        ),
+      ),
+    );
+  }
+
+  // Person icon in a circle with a small drop arrow on its lower right
+  Widget _buildProfileMenu() {
+    return PopupMenuButton<_ProfileAction>(
+      tooltip: 'Account',
+      offset: const Offset(0, 56),
+      onSelected: (action) {
+        final manager = context.read<ScreenManager>();
+        switch (action) {
+          case _ProfileAction.avatarSelection:
+            manager.setScreen(Screens.avatarSelection);
+          case _ProfileAction.logOut:
+            manager.setScreen(Screens.login);
+        }
+      },
+      itemBuilder: (_) => const [
+        PopupMenuItem(
+          value: _ProfileAction.avatarSelection,
+          child: Text('Avatar Selection'),
+        ),
+        PopupMenuItem(value: _ProfileAction.logOut, child: Text('Log Out')),
+      ],
+      child: Padding(
+        padding: const EdgeInsets.only(right: 16),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            const CircleAvatar(
+              radius: 16,
+              backgroundColor: AppColors.white,
+              child: Icon(Icons.person, size: 28, color: AppColors.header),
+            ),
+            Positioned(
+              right: -4,
+              bottom: -4,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.blue,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.white, width: .8),
+                ),
+                child: const Icon(
+                  Icons.arrow_drop_down,
+                  size: 16,
+                  color: AppColors.white,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

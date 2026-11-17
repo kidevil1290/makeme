@@ -14,7 +14,7 @@ class NotImplemented extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () =>
-              context.read<ScreenManager>().setScreen(Screens.home),
+              context.read<ScreenManager>().goBack(),
         ),
       ),
       body: Center(

@@ -9,6 +9,7 @@ import 'screens/habit_logger.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/not_implemented.dart';
+import 'screens/status_screen.dart';
 import 'services/screen_manager.dart';
 import 'utils/enums.dart';
 import 'theme/theme.dart';
@@ -53,7 +54,8 @@ class MakeMeApp extends StatelessWidget {
                     Screens.avatarSpecs => const AvatarSpecs(),
                     Screens.notImplemented => const NotImplemented(),
                     Screens.workoutlog =>  const WorkoutLog(),
-                    Screens.template => const WorkoutTemplate(),
+                    Screens.template => const WorkoutTemplateScreen(),
+                    Screens.status => const StatusScreen(),
                   },
                 ),
               ),

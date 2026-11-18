@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
           final Screens target = switch (index) {
             0 => Screens.home,
             1 => Screens.habitLogger,
-            _ => Screens.notImplemented,
+            _ => Screens.status,
           };
           context.read<ScreenManager>().setScreen(target);
         },

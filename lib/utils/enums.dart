@@ -4,8 +4,9 @@ enum Screens { login,
                 avatarSpecs, 
                 notImplemented, 
                 workoutlog, 
-                template}
-
+                template,
+                status,
+              }
 enum Gender { male, female }
 
 enum BuildType { skinny, average, athletic, heavy }
@@ -36,3 +37,4 @@ enum BodyPartName {
 
 // How hard a work out was, scales growth
 enum Intensity { light, medium, heavy }
+

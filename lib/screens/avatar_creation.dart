@@ -133,9 +133,8 @@ class _AvatarCreationState extends State<AvatarCreation> {
     );
   }
 
-  // Temp widget for avatar preview,
-  // white box as background preview
-  // with a TEMP circle to test skinColor
+  // Avatar preview on a white box,
+  // redrawn with the sprites after every change
   Widget _buildPreview(Avatar preview) {
     return Container(
       width: _previewWidth,
@@ -144,19 +143,10 @@ class _AvatarCreationState extends State<AvatarCreation> {
         color: AppColors.white,
         borderRadius: BorderRadius.circular(16),
       ),
-      // TEMP for testing skinColor slider
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 110,
-            height: 110,
-            decoration: BoxDecoration(
-              color: _colorAt(hairColor, _hairTone),
-              shape: BoxShape.circle,
-            ),
-          ),
-        ],
+      child: AvatarDisplay(
+        avatar: preview,
+        width: _previewWidth,
+        height: _previewHeight,
       ),
     );
   }
@@ -360,8 +350,8 @@ class _AvatarCreationState extends State<AvatarCreation> {
   @override
   Widget build(BuildContext context) {
     // Draft of the avatar based on selected options
-    // used for preview
-    final Avatar preview = Avatar(
+    // used for preview (Avatar.start so the chosen build shows)
+    final Avatar preview = Avatar.start(
       avatarName: _avatarName,
       weeklyGoal: _weeklyGoal,
       gender: _gender,

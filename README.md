@@ -1,7 +1,31 @@
-# MakeMe
+# MakeMe's Progress
 
+### Unfinished Features
+1. Saving and Loading user data
+2. CycleManager
+3. Ascension System
+4. WorkoutLogging
+5. Avatar History
+6. Workout History
 
+### Known Issues
+1. All data is lost when the app closes, because nothing is saved.
 
+### Report Sections Still to be Completed
+Unchanged from previous submission.
+1. Add reference for
+    - Broad claim on numerical statistics
+    - 90-day Cycle
+2. Clarification on the 90-day Cycle
+3. Comparison to Proposal to table
+4. Update persona
+5. Update scope
+6. Update High Level Requirements
+7. Update UML class diagram
+8. Update Sequence diagram
+9. Results and Discussion Section
+10. Testing and Results Section
+11. Conclusion and Future Work Section
 
 
 ## Team Members
@@ -65,12 +89,14 @@ flutter run
 
 ## Project Structure
 ```
-|-lib/ -- all Dart code lives here
-    |-models/       data classes from UML diagram (no UI)
+|-lib/              all Dart code lives here
+    |-models/       data classes from UML diagram and app state
     |-screens/      full app screens/scene/pages that user navigates to
     |-widgets/      reusable UI components shared accross screens
     |-services/     logic, database operations, calculations
-    |-utils/        constants, enums, and helper functions
+    |-theme/        app theme
+    |-utils/        enums, asset path helpers
+    |-app.dart      root widget, provider and screen switching
     |-main.dart     app entry point
 |-assets/
     |-fonts/

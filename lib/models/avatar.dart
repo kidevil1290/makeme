@@ -23,7 +23,7 @@ class Avatar {
   final Color hairColor;
 
   // Level of each trained muscle, up to maxLevel.
-  // From 0.0 for average/athletic. From -1.0 for skinny/heavy while transitioning.
+  // From 0.0 for average, 1.0 for athletic. From -1.0 for skinny/heavy while transitioning.
   final Map<BodyPartName, double> muscleGrowth;
 
   // Does not construct without all required data
@@ -51,7 +51,7 @@ class Avatar {
   }) {
     final bool transitions =
         build == BuildType.skinny || build == BuildType.heavy;
-    final double startLevel = transitions ? transitionStart : 0.0;
+    final double startLevel = transitions ? transitionStart : (build == BuildType.athletic ? 1.0 : 0.0);
     return Avatar(
       avatarName: avatarName,
       weeklyGoal: weeklyGoal,

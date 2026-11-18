@@ -13,7 +13,7 @@ enum Gender { male, female }
 
 // Starting build chosen in the initial survey.
 // Skinny and heavy start every muscle at -1.0 then transition to average as the mean muscle level rises to 0.0:
-// average and athletic start at 0.0.
+// average starts at 0.0 and athletic at 1.0 (the small muscle level).
 enum BuildType { heavy, skinny, average, athletic }
 
 enum HeadPart {

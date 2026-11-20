@@ -15,7 +15,7 @@ const _avatar = Avatar(
   head: HeadConfig(eyes: 2, nose: 1, mouth: 0, hair: 1),
   skinColor: Color(0xFFC68642),
   hairColor: Color(0xFF2B1B0E),
-  muscleGrowth: {BodyPartName.chest: 2.5, BodyPartName.legs: 1.0},
+  muscleGrowth: {BodyPartName.pects: 2.5, BodyPartName.quads: 1.0},
 );
 
 // Simulates save and load
@@ -36,18 +36,18 @@ void main() {
       expect(restored.build, BuildType.athletic);
       expect(restored.head.eyes, 2);
       expect(restored.head.hair, 1);
-      expect(restored.growthOf(BodyPartName.chest), 2.5);
-      expect(restored.growthOf(BodyPartName.legs), 1.0);
+      expect(restored.growthOf(BodyPartName.pects), 2.5);
+      expect(restored.growthOf(BodyPartName.quads), 1.0);
     });
 
     test('accepts whole numbers as growth values', () {
       final json = _avatar.toJson();
-      json['muscleGrowth'] = {'chest': 2, 'legs': 1}; // ints, not doubles
+      json['muscleGrowth'] = {'pects': 2, 'quads': 1}; // ints, not doubles
 
       final restored = Avatar.fromJson(json);
 
-      expect(restored.growthOf(BodyPartName.chest), 2.0);
-      expect(restored.growthOf(BodyPartName.legs), 1.0);
+      expect(restored.growthOf(BodyPartName.pects), 2.0);
+      expect(restored.growthOf(BodyPartName.quads), 1.0);
     });
     test('keeps the exact colors', () {
       final restored = _roundTrip(_avatar);
@@ -61,7 +61,7 @@ void main() {
 
       expect(json['gender'], 'male');
       expect(json['build'], 'athletic');
-      expect(json['muscleGrowth'], {'chest': 2.5, 'legs': 1.0});
+      expect(json['muscleGrowth'], {'pects': 2.5, 'quads': 1.0});
     });
 
     test('skips a muscle name that no longer exists', () {
@@ -71,8 +71,8 @@ void main() {
 
       final restored = Avatar.fromJson(json);
 
-      expect(restored.growthOf(BodyPartName.chest), 2.5);
-      expect(restored.growthOf(BodyPartName.legs), 1.0);
+      expect(restored.growthOf(BodyPartName.pects), 2.5);
+      expect(restored.growthOf(BodyPartName.quads), 1.0);
       expect(
         restored.muscleGrowth.length,
         2,
@@ -85,7 +85,7 @@ void main() {
 
       final restored = Avatar.fromJson(json);
 
-      expect(restored.growthOf(BodyPartName.chest), 0.0);
+      expect(restored.growthOf(BodyPartName.pects), 0.0);
     });
 
     test('a missing required field throws', () {

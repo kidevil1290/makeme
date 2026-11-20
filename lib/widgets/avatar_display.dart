@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/avatar.dart';
+import '../models/avatar_sprites.dart';
 import '../utils/asset_paths.dart';
 import '../utils/enums.dart';
 
@@ -41,19 +42,19 @@ class AvatarDisplay extends StatelessWidget {
     return Positioned.fill(child: image);
   }
 
-  // Muscle layers at shared level g.
+  // Muscle layers at shared level g (sprites.borderLevel).
   // Each region shows the sprite for the last whole level it has reached:
   // A region at 1.9 still shows level 1 and jumps to level 2 at 2.0.
   // Sprites only exist for levels at or above g, so s never goes below it.
-  List<Widget> _muscles(int g) {
+  List<Widget> _muscles(AvatarSprites sprites) {
     return [
       for (final region in AssetPaths.bodyOrder)
         _layer(
           AssetPaths.bodyLayer(
             avatar.gender,
             region,
-            g,
-            avatar.regionStep(region).clamp(g, Avatar.maxLevel).toInt(),
+            sprites.borderLevel,
+            sprites.regionSprite(region),
           ),
           avatar.skinColor,
         ),
@@ -62,13 +63,12 @@ class AvatarDisplay extends StatelessWidget {
 
   // Body for a skinny/heavy build that has not reached average yet:
   // Like the muscles, it changes sprite in steps:
-  // Avatar.buildStep is -1.0 (full build, 100 %) until the mean muscle level reaches -0.5,
-  // then -0.5 (halfway build, 50 %) until it reaches 0.0, when the build is complete,
-  // every muscle resets to 0.0 and the muscle layers take over.
-  Widget _buildBody() {
-    final int stage = (avatar.buildStep * -100).round(); // 100 or 50
+  // sprites.buildStage is 100 (full build) until the mean muscle level reaches -0.5,
+  // then 50 (halfway build) until it reaches 0.0, when the build is complete and
+  // the muscle layers take over.
+  Widget _buildBody(AvatarSprites sprites) {
     return _layer(
-      AssetPaths.buildLayer(avatar.gender, avatar.build, stage),
+      AssetPaths.buildLayer(avatar.gender, avatar.build, sprites.buildStage),
       avatar.skinColor,
     );
   }
@@ -76,14 +76,14 @@ class AvatarDisplay extends StatelessWidget {
   // The "..." unpacks each list of layers into this stack depending on build.
   @override
   Widget build(BuildContext context) {
-    final bool transitioning = !avatar.isBuildComplete;
-    final int g = transitioning ? 0 : avatar.sharedLevel;
+    final AvatarSprites sprites = AvatarSprites(avatar);
+    final int g = sprites.borderLevel;
     return SizedBox(
       width: width,
       height: height,
       child: Stack(
         children: [
-          if (transitioning) _buildBody() else ..._muscles(g),
+          if (sprites.transitioning) _buildBody(sprites) else ..._muscles(sprites),
           _layer(AssetPaths.eyes(avatar.gender), null),
           _layer(AssetPaths.head(avatar.gender, g), avatar.skinColor),
           for (final part in [HeadPart.nose, HeadPart.mouth, HeadPart.eyes])

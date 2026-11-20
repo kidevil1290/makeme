@@ -17,7 +17,7 @@ Avatar _avatar(String name) {
     head: const HeadConfig(eyes: 2, nose: 1, mouth: 0, hair: 1),
     skinColor: const Color(0xFFC68642),
     hairColor: const Color(0xFF2B1B0E),
-    muscleGrowth: {BodyPartName.chest: 2.5},
+    muscleGrowth: {BodyPartName.pects: 2.5},
   );
 }
 

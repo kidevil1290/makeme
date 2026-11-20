@@ -88,4 +88,52 @@ class Avatar {
     updated[part] = next;
     return copyWith(muscleGrowth: updated);
   }
+
+  // Avatar object -> a map of simple values, ready for jsonEncode
+  Map<String, dynamic> toJson() {
+    return {
+      'avatarName': avatarName,
+      'weeklyGoal': weeklyGoal,
+      'gender': gender.name, // enums are saved by name ("male")
+      'build': build.name,
+      'head': head.toJson(), // head converts itself through HeadConfig.toJson
+      'skinColor': skinColor.toARGB32(), // saved as one whole number
+      'hairColor': hairColor.toARGB32(),
+      'muscleGrowth': muscleGrowth.map(
+        // enum keys become their names e.g. {pects: 2.5}
+        (part, value) => MapEntry(part.name, value),
+      ),
+    };
+  }
+
+  // Map from jsonDecode -> Avatar
+  // Required fields throw if missing
+  // Muscle map is forgiving. A name that is no longer in BodyPartName is skipped
+  // and a muscle with no saved value falls back to growthOf 0.0
+  factory Avatar.fromJson(Map<String, dynamic> json) {
+    // asNameMap(): {"pects": BodyPartName.pects, ...} unknown names give null
+    final partsByName = BodyPartName.values.asNameMap();
+    final rawGrowth = (json['muscleGrowth'] as Map<String, dynamic>?) ?? {};
+
+    final growth = <BodyPartName, double>{};
+    // Reads the saved muscle map back into enum keys
+    for (final entry in rawGrowth.entries) {
+      final part = partsByName[entry.key];
+      // skips if the enum key does not exist
+      if (part != null) {
+        growth[part] = (entry.value as num).toDouble();
+      }
+    }
+
+    return Avatar(
+      avatarName: json['avatarName'] as String,
+      weeklyGoal: json['weeklyGoal'] as int,
+      gender: Gender.values.byName(json['gender'] as String),
+      build: BuildType.values.byName(json['build'] as String),
+      head: HeadConfig.fromJson(json['head'] as Map<String, dynamic>),
+      skinColor: Color(json['skinColor'] as int),
+      hairColor: Color(json['hairColor'] as int),
+      muscleGrowth: growth,
+    );
+  }
 }

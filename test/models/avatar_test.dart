@@ -42,7 +42,7 @@ void main() {
 
     test('accepts whole numbers as growth values', () {
       final json = _avatar.toJson();
-      json['MuscleGrowth'] = {'chest': 2, 'legs': 1};   // ints, not doubles
+      json['muscleGrowth'] = {'chest': 2, 'legs': 1}; // ints, not doubles
 
       final restored = Avatar.fromJson(json);
 
@@ -66,13 +66,17 @@ void main() {
 
     test('skips a muscle name that no longer exists', () {
       final json = _avatar.toJson();
-      (json['muscleGrowth'] as Map<String, dynamic>)['horn'] = 3.0;  // adds horn into the JSON map
+      (json['muscleGrowth'] as Map<String, dynamic>)['horn'] =
+          3.0; // adds horn into the JSON map
 
       final restored = Avatar.fromJson(json);
 
       expect(restored.growthOf(BodyPartName.chest), 2.5);
       expect(restored.growthOf(BodyPartName.legs), 1.0);
-      expect(restored.muscleGrowth.length, 2);    // horn doesnt exist on the enum so it gets dropped
+      expect(
+        restored.muscleGrowth.length,
+        2,
+      ); // horn doesnt exist on the enum so it gets dropped
     });
 
     test('missing muscle map loads as an untrained avatar', () {
@@ -80,7 +84,7 @@ void main() {
       json.remove('muscleGrowth');
 
       final restored = Avatar.fromJson(json);
-      
+
       expect(restored.growthOf(BodyPartName.chest), 0.0);
     });
 

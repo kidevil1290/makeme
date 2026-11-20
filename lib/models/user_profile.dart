@@ -31,7 +31,7 @@ class UserProfile extends ChangeNotifier {
     required Color hairColor,
   }) {
     if (_avatar != null) return;
-    _avatar = Avatar(
+    _avatar = Avatar.start(
       avatarName: avatarName,
       weeklyGoal: weeklyGoal,
       gender: gender,

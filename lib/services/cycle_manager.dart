@@ -1,9 +1,10 @@
 import '../models/avatar.dart';
+import '../models/avatar_sprites.dart';
 
 // UserProfile calls update() whenever the avatar changes
-// Tracks the 90 day cycle and decides when the avatar can ascend
+// Tracks the 91 day cycle (13 weeks) and decides when the avatar can ascend
 class CycleManager {
-  static const int cycleDays = 90;
+  static const int cycleDays = 91;
 
   DateTime? _cycleStart;
   bool _canAscend = false;
@@ -23,10 +24,10 @@ class CycleManager {
     return (now ?? DateTime.now()).difference(start).inDays;
   }
 
-  // Ascension is offered when ALL of the avatar's muscles are maxed or 90 days have passed
+  // Ascension is offered when ALL of the avatar's muscles are maxed or 91 days have passed
   void update(Avatar avatar, [DateTime? now]) {
     if (_cycleStart == null) return;
-    _canAscend = avatar.isMaxed || daysElapsed(now) >= cycleDays;
+    _canAscend = AvatarSprites(avatar).isMaxed || daysElapsed(now) >= cycleDays;
   }
 
   // Clears the cycle when user ascends

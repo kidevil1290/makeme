@@ -7,6 +7,7 @@ enum Screens {
   notImplemented,
   workoutlog,
   template,
+  status,
 }
 
 enum Gender { male, female }

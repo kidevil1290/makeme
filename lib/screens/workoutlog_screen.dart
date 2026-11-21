@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../utils/enums.dart';
 import '../services/screen_manager.dart';
 
@@ -85,7 +84,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
         title: const Text('Workout Log'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => manager.goBack(),
+          onPressed: () => manager.setScreen(Screens.home),
         ),
       ),
       body: SafeArea(

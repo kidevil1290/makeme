@@ -7,6 +7,7 @@ enum Screens {
   notImplemented,
   workoutlog,
   template,
+  status,
 }
 
 enum Gender { male, female }
@@ -62,3 +63,4 @@ enum BodyPartName {
 
 // How hard a work out was, scales growth
 enum Intensity { light, medium, heavy }
+

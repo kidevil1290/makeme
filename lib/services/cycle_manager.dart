@@ -10,8 +10,10 @@ class CycleManager {
   bool _canAscend = false;
 
   bool get canAscend => _canAscend;
+  // UserProfile reads it to save
+  DateTime? get cycleStart => _cycleStart;
 
-  // Called once after avatar creation
+  // Called after avatar creation
   void startCycle([DateTime? now]) {
     _cycleStart = now ?? DateTime.now();
     _canAscend = false;
@@ -34,5 +36,14 @@ class CycleManager {
   void reset() {
     _cycleStart = null;
     _canAscend = false;
+  }
+
+  // Loads a saved cycle after app restarts
+  // canAscend is not saved, so it is recalculated here
+  // No start date means no cycle, UserProfile must start a new one
+  void restore(DateTime? start, Avatar? avatar, [DateTime? now]) {
+    _cycleStart = start;
+    _canAscend = false;
+    if (avatar != null) update(avatar, now);
   }
 }

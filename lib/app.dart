@@ -8,15 +8,19 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/not_implemented.dart';
 import 'screens/avatar_selection.dart';
-import 'screens/workout_template.dart';
+import 'screens/templates_screen.dart';
 import 'screens/workoutlog_screen.dart';
 import 'screens/status_screen.dart';
 import 'services/screen_manager.dart';
 import 'utils/enums.dart';
 import 'theme/theme.dart';
+import 'models/user_data.dart';
+import 'services/storage_service.dart';
 
 class MakeMeApp extends StatelessWidget {
-  const MakeMeApp({super.key});
+  final StorageService storage;
+  final UserData data;
+  const MakeMeApp({super.key, required this.storage, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +28,10 @@ class MakeMeApp extends StatelessWidget {
       // Shared objects any screen can reach with context.read / context.watch
       providers: [
         ChangeNotifierProvider(create: (_) => ScreenManager()),
-        ChangeNotifierProvider(create: (_) => UserProfile()),
+        // loaded at startup, only used to build the UserProfile
+        ChangeNotifierProvider(
+          create: (_) => UserProfile(storage: storage, data: data),
+        ),
       ],
       child: MaterialApp(
         title: 'MakeMe',

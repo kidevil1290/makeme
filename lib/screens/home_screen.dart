@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../services/screen_manager.dart';
 import '../utils/enums.dart';
 import '../theme/theme.dart';
+import '../models/user_profile.dart';
+import '../widgets/avatar_display.dart';
 
 enum _ProfileAction { avatarSelection, logOut }
 
@@ -103,9 +105,30 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Title, subtitle and the illustration
+  // The avatar, drawn from the saved UserProfile.
+  // context.watch rebuilds this screen whenever the avatar changes,
+  // so a logged workout shows up here without any extra code.
   Widget _buildHeroSection() {
-    return Column(mainAxisAlignment: MainAxisAlignment.center);
+    final avatar = context.watch<UserProfile>().avatar;
+
+    // No avatar yet (first launch, before creation): show a short message
+    // instead of crashing, because avatar is nullable.
+    if (avatar == null) {
+      return const Center(child: Text('Create an avatar to get started'));
+    }
+
+    // LayoutBuilder gives the space left over by the tab bar and the button.
+    // The sprites are about 1:2 (width:height), so the height decides the size:
+    // height = constraints.maxHeight, width = half of it.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double height = constraints.maxHeight - 16;
+        final double width = height / 2;
+        return Center(
+          child: AvatarDisplay(avatar: avatar, width: width, height: height),
+        );
+      },
+    );
   }
 
   // Start button on the bottom

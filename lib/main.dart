@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 
 import 'app.dart';
-import 'services/workout_service.dart';
+import 'services/storage_service.dart';
 
 Future<void> main() async {
+  // Needed before using the device storage ahead of runApp
   WidgetsFlutterBinding.ensureInitialized();
+  final storage = StorageService();
+  // The app only starts once the data is here
+  final data = await storage.load();
 
-  final workoutService = await WorkoutService.create();
-
-  runApp(
-    ChangeNotifierProvider<WorkoutService>.value(
-      value: workoutService,
-      child: const MakeMeApp(),
-    ),
-  );
+  runApp(MakeMeApp(storage: storage, data: data));
 }

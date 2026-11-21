@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../utils/enums.dart';
 import '../services/screen_manager.dart';
+import '../models/user_profile.dart';
+import '../theme/theme.dart';
 
 //display labels with enum
 String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
@@ -36,12 +39,23 @@ class _WorkoutLogState extends State<WorkoutLog> {
   final _durationController = TextEditingController();
   final Set<BodyPartName> _selectedBodyParts = {};
   Intensity? _intensity;
+  String? _templateUsed;
+  int _formResets = 0;
 
   @override
   void initState() {
     super.initState();
     // Rebuild so the Save button enables/disables as the user types.
     _durationController.addListener(() => setState(() {}));
+
+    // A template picked on the template screen fills in the muscles and
+    // the intnsity, the duration is still chosen here
+    final template = context.read<UserProfile>().takePendingTemplate();
+    if (template != null) {
+      _selectedBodyParts.addAll(template.bodyParts);
+      _intensity = template.intensity;
+      _templateUsed = template.name;
+    }
   }
 
   @override
@@ -55,22 +69,25 @@ class _WorkoutLogState extends State<WorkoutLog> {
       _selectedBodyParts.isNotEmpty &&
       _intensity != null;
 
+  // Saves the log and gives the avatar its growth, in one write
   void _save() {
-    // TODO: persist the log entry (database / API).
-    final entry = (
+    context.read<UserProfile>().addWorkout(
       durationMinutes: _durationMinutes!,
       bodyParts: _selectedBodyParts.toList(),
       intensity: _intensity!,
+      templateUsed: _templateUsed,
     );
-    debugPrint('Workout saved: $entry');
 
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Workout logged')));
 
     setState(() {
       _durationController.clear();
+      _durationMinutes = null;
       _selectedBodyParts.clear();
       _intensity = null;
+      _templateUsed = null;
+      _formResets++;
     });
   }
 
@@ -97,6 +114,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
               Text('Duration', style: textTheme.titleMedium),
               const SizedBox(height: 8),
               DropdownButtonFormField<int>(
+                key: ValueKey(_formResets),
                 initialValue: _durationMinutes,
                 isExpanded: true,
                 menuMaxHeight: 320,
@@ -129,6 +147,16 @@ class _WorkoutLogState extends State<WorkoutLog> {
                     FilterChip(
                       label: Text(part.label),
                       selected: _selectedBodyParts.contains(part),
+                      selectedColor: AppColors.buttonBlue,
+                      checkmarkColor: AppColors.white,
+                      labelStyle: TextStyle(
+                        color: _selectedBodyParts.contains(part)
+                            ? AppColors.white
+                            : null,
+                        fontWeight: _selectedBodyParts.contains(part)
+                            ? FontWeight.w600
+                            : null,
+                      ),
                       onSelected: (selected) {
                         setState(() {
                           if (selected) {
@@ -151,6 +179,10 @@ class _WorkoutLogState extends State<WorkoutLog> {
                 child: SegmentedButton<Intensity>(
                   emptySelectionAllowed: true,
                   showSelectedIcon: false,
+                  style: SegmentedButton.styleFrom(
+                    selectedBackgroundColor: AppColors.buttonBlue,
+                    selectedForegroundColor: AppColors.white,
+                  ),
                   segments: [
                     for (final level in Intensity.values)
                       ButtonSegment(value: level, label: Text(level.label)),

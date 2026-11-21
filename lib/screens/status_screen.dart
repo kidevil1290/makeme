@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/screen_manager.dart';
-import '../services/workout_service.dart';
-import '../models/workoutlog.dart';
+import '../models/user_profile.dart';
+import '../models/workout_log.dart';
 import '../utils/enums.dart';
 
 
@@ -97,7 +97,7 @@ class _StatusScreenState extends State<StatusScreen> {
     final manager = context.read<ScreenManager>();
 
     final history =
-        context.watch<WorkoutService>().history;
+        context.watch<UserProfile>().workoutHistory;
 
     final textTheme = Theme.of(context).textTheme;
 

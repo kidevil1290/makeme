@@ -47,4 +47,27 @@ class HeadConfig {
       HeadPart.hair => copyWith(hair: option),
     };
   }
+
+  // Returns a map of the currently selected head options into a map
+  Map<String, dynamic> toJson() {
+    return {'eyes': _eyes, 'nose': _nose, 'mouth': _mouth, 'hair': _hair};
+  }
+
+  // builds a HeadConfig from a map from jsonDecode
+  // missing keys default to 0 and out of range values are clamped
+  factory HeadConfig.fromJson(Map<String, dynamic> json) {
+    return HeadConfig(
+      eyes: _optionFromJson(json['eyes'], HeadPart.eyes),
+      nose: _optionFromJson(json['nose'], HeadPart.nose),
+      mouth: _optionFromJson(json['mouth'], HeadPart.mouth),
+      hair: _optionFromJson(json['hair'], HeadPart.hair),
+    );
+  }
+
+  // Reads on saved option and clamps it into valid range
+  // as a safeguard for corrupted values
+  static int _optionFromJson(Object? raw, HeadPart part) {
+    final value = (raw as int?) ?? 0;
+    return value.clamp(0, part.optionCount - 1);
+  }
 }

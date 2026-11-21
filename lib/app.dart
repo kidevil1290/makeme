@@ -8,7 +8,7 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/not_implemented.dart';
 import 'screens/avatar_selection.dart';
-import 'screens/workout_template.dart';
+import 'screens/templates_screen.dart';
 import 'screens/workoutlog_screen.dart';
 import 'screens/status_screen.dart';
 import 'services/screen_manager.dart';

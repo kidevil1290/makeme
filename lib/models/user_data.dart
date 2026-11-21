@@ -1,4 +1,6 @@
 import 'avatar.dart';
+import 'workout_log.dart';
+import 'workout_template.dart';
 
 // Everything the app saves, as one immutable snapshot
 // It only holds data and converts itself to and from JSON
@@ -8,14 +10,21 @@ class UserData {
 
   final int version;
   final Avatar? avatar;
+  // past avatars from earlier cycles
   final List<Avatar> history;
-  final DateTime?
-  cycleStart; // when the current cycle began, CycleManager keeps the live copy
+  // every logged workout, UserProfile keeps its newest first
+  final List<WorkoutLogEntry> workoutHistory;
+  // user's saved workout templates
+  final List<WorkoutTemplate> templates;
+  // when the current cycle began, CycleManager keeps the live copy
+  final DateTime? cycleStart;
 
   const UserData({
     this.version = currentVersion,
     this.avatar,
     this.history = const [],
+    this.workoutHistory = const [],
+    this.templates = const [],
     this.cycleStart,
   });
 
@@ -28,7 +37,10 @@ class UserData {
       'avatar': avatar?.toJson(),
       // iterates through the List of history -> map of simple values -> List of Maps
       'history': history.map((a) => a.toJson()).toList(),
-      'cycleStart': cycleStart?.toIso8601String(), // converts DateTime to format "2026-11-20T08:30:00.000"
+      'workoutHistory': workoutHistory.map((w) => w.toJson()).toList(),
+      'templates': templates.map((t) => t.toJson()).toList(),
+      // converts DateTime to format "2026-11-20T08:30:00.000"
+      'cycleStart': cycleStart?.toIso8601String(),
     };
   }
 
@@ -36,23 +48,36 @@ class UserData {
     final rawAvatar = json['avatar'] as Map<String, dynamic>?;
     final rawStart = json['cycleStart'] as String?;
 
-    final history = <Avatar>[];
-    for (final item in (json['history'] as List?) ?? const []) {
-      try {
-        history.add(Avatar.fromJson(item as Map<String, dynamic>));
-      } catch (_) {
-        // skips this record and keeps the rest
-      }
-    }
-
     return UserData(
       version: (json['version'] as int?) ?? currentVersion,
       // nothing is saved? then null, otherwise build the avatar
       avatar: rawAvatar == null ? null : Avatar.fromJson(rawAvatar),
-      history: history,
+      history: _readList(json['history'], Avatar.fromJson),
+      workoutHistory: _readList(
+        json['workoutHistory'],
+        WorkoutLogEntry.fromJson,
+      ),
+      templates: _readList(json['templates'], WorkoutTemplate.fromJson),
       // returns null for unreadable text instead of throwing
       // safeguard for bad Date that could wipe all progress
       cycleStart: rawStart == null ? null : DateTime.tryParse(rawStart),
     );
+  }
+
+  // Generic helper function that reads a saved list and skips
+  // any entry that cannot be read
+  static List<T> _readList<T>(
+    Object? raw,
+    T Function(Map<String, dynamic>) fromJson,
+  ) {
+    final items = <T>[];
+    for (final item in (raw as List?) ?? const []) {
+      try {
+        items.add(fromJson(item as Map<String, dynamic>));
+      } catch (_) {
+        // skips this entry and keeps the rest
+      }
+    }
+    return items;
   }
 }

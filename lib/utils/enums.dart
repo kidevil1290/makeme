@@ -63,3 +63,4 @@ enum BodyPartName {
 
 // How hard a work out was, scales growth
 enum Intensity { light, medium, heavy }
+

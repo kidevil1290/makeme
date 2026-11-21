@@ -5,6 +5,7 @@ import 'package:makeme/models/avatar.dart';
 import 'package:makeme/models/head_config.dart';
 import 'package:makeme/models/user_data.dart';
 import 'package:makeme/models/user_profile.dart';
+import 'package:makeme/models/workout_log.dart';
 import 'package:makeme/services/storage_service.dart';
 import 'package:makeme/utils/enums.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
@@ -40,6 +41,16 @@ void _create(UserProfile profile, String name) {
   );
 }
 
+// Helper function to simulate recording a workout
+WorkoutLogEntry _log(UserProfile profile, {DateTime? date}) {
+  return profile.addWorkout(
+    durationMinutes: 60,
+    bodyParts: [BodyPartName.pects, BodyPartName.quads],
+    intensity: Intensity.moderate,
+    date: date,
+  );
+}
+
 void main() {
   // A new empty storage before every test
   setUp(() {
@@ -53,6 +64,8 @@ void main() {
 
       expect(profile.hasAvatar, false);
       expect(profile.history, isEmpty);
+      expect(profile.workoutHistory, isEmpty);
+      expect(profile.templates, isEmpty);
       expect(profile.canAscend, false);
     });
 
@@ -102,40 +115,6 @@ void main() {
       expect(profile.avatar?.avatarName, 'First');
     });
 
-    test('addGrowth is saved', () async {
-      final profile = _profile();
-      _create(profile, 'Created');
-
-      profile.addGrowth(BodyPartName.pects, 1.5);
-      await pumpEventQueue();
-      final saved = await StorageService().load();
-
-      expect(saved.avatar?.growthOf(BodyPartName.pects), 1.5);
-    });
-
-    test('addGrowthAll saves every muscle', () async {
-      final profile = _profile();
-      _create(profile, 'Created');
-
-      profile.addGrowthAll({BodyPartName.pects: 1.0, BodyPartName.quads: 2.0});
-      await pumpEventQueue();
-      final saved = await StorageService().load();
-
-      expect(saved.avatar?.growthOf(BodyPartName.pects), 1.0);
-      expect(saved.avatar?.growthOf(BodyPartName.quads), 2.0);
-    });
-
-    test('addGrowthAll redraws only once', () {
-      final profile = _profile();
-      _create(profile, 'Created');
-      var redraws = 0;
-      profile.addListener(() => redraws++);
-
-      profile.addGrowthAll({BodyPartName.pects: 1.0, BodyPartName.quads: 2.0});
-
-      expect(redraws, 1);
-    });
-
     test('ascend is saved: history is kept, cycle and avatar gone', () async {
       final profile = _profile();
       _create(profile, 'Created');
@@ -152,7 +131,16 @@ void main() {
     test('everything survives a restart', () async {
       final profile = _profile();
       _create(profile, 'Created');
-      profile.addGrowth(BodyPartName.pects, 1.5);
+      profile.addWorkout(
+          durationMinutes: 45,
+          bodyParts: [BodyPartName.pects],
+          intensity: Intensity.moderate,
+      );
+      profile.addTemplate(
+        name: 'Push day',
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.heavy,
+      );
       await pumpEventQueue();
 
       // a restart: load what was saved, then build a new profile from it
@@ -160,6 +148,174 @@ void main() {
 
       expect(restarted.avatar?.avatarName, 'Created');
       expect(restarted.avatar?.growthOf(BodyPartName.pects), 1.5);
+      expect(restarted.workoutHistory.single.durationMinutes, 45);
+      expect(restarted.templates.single.name, 'Push day');
+    });
+  });
+
+  group('addWorkout', () {
+    test('grows the trained muscles', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      _log(profile);
+
+      expect(profile.avatar?.growthOf(BodyPartName.pects), 1.0);
+      expect(profile.avatar?.growthOf(BodyPartName.quads), 1.0);
+      expect(profile.avatar?.growthOf(BodyPartName.abs), 0.0);
+    });
+
+    test('saves the workout and the growth together', () async {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      _log(profile);
+      await pumpEventQueue();
+      final saved = await StorageService().load();
+
+      expect(saved.workoutHistory.single.durationMinutes, 60);
+      expect(saved.avatar?.growthOf(BodyPartName.pects), 1.0);
+    });
+
+    test('redraws only once', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+      var redraws = 0;
+      profile.addListener(() => redraws++);
+
+      _log(profile);
+
+      expect(redraws, 1);
+    });
+
+    test('a zero duration throws and changes nothing', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      expect(
+        () => profile.addWorkout(
+          durationMinutes: 0,
+          bodyParts: [BodyPartName.pects],
+          intensity: Intensity.light,
+        ),
+        throwsArgumentError,
+      );
+      expect(profile.workoutHistory, isEmpty);
+    });
+
+    test('no body parts throws and changes nothing', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      expect(
+        () => profile.addWorkout(
+          durationMinutes: 30,
+          bodyParts: [],
+          intensity: Intensity.light,
+        ),
+        throwsArgumentError,
+      );
+      expect(profile.workoutHistory, isEmpty);
+    });
+  });
+
+  group('templates', () {
+    test('addTemplate saves a trimmed name', () async {
+      final profile = _profile();
+
+      profile.addTemplate(
+        name: '  Push day  ',
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.heavy,
+      );
+      await pumpEventQueue();
+      final saved = await StorageService().load();
+
+      expect(profile.templates.single.name, 'Push day');
+      expect(saved.templates.single.name, 'Push day');
+    });
+
+    test('a blank name or no body parts throws', () {
+      final profile = _profile();
+
+      expect(
+        () => profile.addTemplate(
+          name: '   ',
+          bodyParts: [BodyPartName.pects],
+          intensity: Intensity.heavy,
+        ),
+        throwsArgumentError,
+      );
+      expect(
+        () => profile.addTemplate(
+          name: 'Empty',
+          bodyParts: [],
+          intensity: Intensity.heavy,
+        ),
+        throwsArgumentError,
+      );
+      expect(profile.templates, isEmpty);
+    });
+
+    test('deleteTemplate removes it and saves', () async {
+      final profile = _profile();
+      final template = profile.addTemplate(
+        name: 'Push day',
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.heavy,
+      );
+
+      profile.deleteTemplate(template.id);
+      await pumpEventQueue();
+      final saved = await StorageService().load();
+
+      expect(profile.templates, isEmpty);
+      expect(saved.templates, isEmpty);
+    });
+
+    test('deleting the picked template clears the pending one', () {
+      final profile = _profile();
+      final template = profile.addTemplate(
+        name: 'Push day',
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.heavy,
+      );
+      profile.setPendingTemplate(template);
+
+      profile.deleteTemplate(template.id);
+
+      expect(profile.takePendingTemplate(), isNull);
+    });
+  });
+  
+  group('takePendingTemplate', () {
+    test('hands over the template once, then nothing', () {
+      final profile = _profile();
+      final template = profile.addTemplate(
+        name: 'Push day',
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.heavy,
+      );
+      profile.setPendingTemplate(template);
+
+      expect(profile.takePendingTemplate()?.id, template.id);
+      expect(profile.takePendingTemplate(), isNull);
+    });
+
+    test('does not notify listeners', () {
+      final profile = _profile();
+      final template = profile.addTemplate(
+        name: 'Push day',
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.heavy,
+      );
+      profile.setPendingTemplate(template);
+      var redraws = 0;
+      profile.addListener(() => redraws++);
+
+      profile.takePendingTemplate();
+
+      expect(redraws, 0);
     });
   });
 }

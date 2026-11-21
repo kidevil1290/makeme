@@ -31,7 +31,6 @@ class UserProfile extends ChangeNotifier {
     _avatar = data.avatar;
     _history.addAll(data.history);
     _workoutHistory.addAll(data.workoutHistory);
-    _sortWorkouts();
     _templates.addAll(data.templates);
     _cycle.restore(data.cycleStart, data.avatar);
 
@@ -52,11 +51,9 @@ class UserProfile extends ChangeNotifier {
   bool get hasAvatar => _avatar != null;
   bool get canAscend => _cycle.canAscend;
   List<Avatar> get history => List.unmodifiable(_history);
-  // newest first
   List<WorkoutLogEntry> get workoutHistory =>
       List.unmodifiable(_workoutHistory);
   List<WorkoutTemplate> get templates => List.unmodifiable(_templates);
-  WorkoutTemplate? get pendingTemplate => _pendingTemplate;
 
   // Writes only once: does nothing if an avatar already exists
   // Meant to be called once, when avatar creation is finished
@@ -83,18 +80,8 @@ class UserProfile extends ChangeNotifier {
     _changed();
   }
 
-  // Adds growth to one muscle
-  void addGrowth(BodyPartName part, double amount) {
-    addGrowthAll({part: amount});
-  }
-
-  // Adds growth to several muscles at once, with one save and one redraw
-  void addGrowthAll(Map<BodyPartName, double> amounts) {
-    if (_applyGrowth(amounts)) _changed();
-  }
-
   // Changes the avatar and the cycle but does not save or redraw
-  // Returns flase when there was nothing to change
+  // Returns false when there was nothing to change
   bool _applyGrowth(Map<BodyPartName, double> amounts) {
     final current = _avatar;
     if (current == null || amounts.isEmpty) return false;
@@ -128,7 +115,7 @@ class UserProfile extends ChangeNotifier {
     final entry = WorkoutLogEntry(
       id: now.microsecondsSinceEpoch.toString(),
       durationMinutes: durationMinutes,
-      // a copy, so the caller's list cannot change the saved workout
+      // a copy, to teh saved lists
       bodyParts: List.of(bodyParts),
       intensity: intensity,
       createdAt: date ?? now,
@@ -136,15 +123,9 @@ class UserProfile extends ChangeNotifier {
     );
 
     _workoutHistory.add(entry);
-    _sortWorkouts();
     _applyGrowth(entry.growthByPart);
     _changed();
     return entry;
-  }
-
-  void deleteWorkout(String id) {
-    _workoutHistory.removeWhere((entry) => entry.id == id);
-    _changed();
   }
 
   WorkoutTemplate addTemplate({
@@ -181,11 +162,6 @@ class UserProfile extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearPendingTemplate() {
-    _pendingTemplate = null;
-    notifyListeners();
-  }
-
   // Hands over the picked template once and forgets it
   // No notifyListeners: nothing displays it, and this is called while
   // the log screen is being built, where notifying would cause an error
@@ -203,11 +179,6 @@ class UserProfile extends ChangeNotifier {
     _avatar = null;
     _cycle.reset();
     _changed();
-  }
-
-  // Newest workout first
-  void _sortWorkouts() {
-    _workoutHistory.sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
   // Every change goes through here: save it, then tell the UI

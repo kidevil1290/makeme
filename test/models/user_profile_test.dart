@@ -10,6 +10,7 @@ import 'package:makeme/services/storage_service.dart';
 import 'package:makeme/utils/enums.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:makeme/models/avatar_record.dart';
 
 // Sample avatar
 Avatar _avatar(String name) {
@@ -21,6 +22,17 @@ Avatar _avatar(String name) {
     head: const HeadConfig(),
     skinColor: const Color(0xFFC68642),
     hairColor: const Color(0xFF2B1B0E),
+  );
+}
+
+// Sample finished cycle
+AvatarRecord _record(String name) {
+  return AvatarRecord(
+    avatar: _avatar(name),
+    startedAt: DateTime(2026, 8, 1),
+    endedAt: DateTime(2026, 10, 31),
+    weeksMet: 10,
+    totalWeeks: 13,
   );
 }
 
@@ -42,12 +54,11 @@ void _create(UserProfile profile, String name) {
 }
 
 // Helper function to simulate recording a workout
-WorkoutLogEntry _log(UserProfile profile, {DateTime? date}) {
+WorkoutLogEntry _log(UserProfile profile) {
   return profile.addWorkout(
     durationMinutes: 60,
     bodyParts: [BodyPartName.pects, BodyPartName.quads],
     intensity: Intensity.moderate,
-    date: date,
   );
 }
 
@@ -74,7 +85,7 @@ void main() {
       final profile = _profile(
         UserData(
           avatar: _avatar('Current'),
-          history: [_avatar('Old')],
+          history: [_record('Old')],
           cycleStart: DateTime(2020),
         ),
       );
@@ -124,7 +135,7 @@ void main() {
       final saved = await StorageService().load();
 
       expect(saved.avatar, isNull);
-      expect(saved.history.single.avatarName, 'Created');
+      expect(saved.history.single.avatar.avatarName, 'Created');
       expect(saved.cycleStart, isNull);
     });
 
@@ -132,9 +143,9 @@ void main() {
       final profile = _profile();
       _create(profile, 'Created');
       profile.addWorkout(
-          durationMinutes: 45,
-          bodyParts: [BodyPartName.pects],
-          intensity: Intensity.moderate,
+        durationMinutes: 45,
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.moderate,
       );
       profile.addTemplate(
         name: 'Push day',
@@ -287,7 +298,7 @@ void main() {
       expect(profile.takePendingTemplate(), isNull);
     });
   });
-  
+
   group('takePendingTemplate', () {
     test('hands over the template once, then nothing', () {
       final profile = _profile();

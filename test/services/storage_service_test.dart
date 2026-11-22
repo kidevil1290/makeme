@@ -8,6 +8,7 @@ import 'package:makeme/services/storage_service.dart';
 import 'package:makeme/utils/enums.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:makeme/models/avatar_record.dart';
 
 // Keeps the text in a map instead of on a device
 class _MemoryStore implements TextStore {
@@ -35,6 +36,16 @@ Avatar _avatar(String name) {
   );
 }
 
+AvatarRecord _record(String name) {
+  return AvatarRecord(
+    avatar: _avatar(name),
+    startedAt: DateTime(2026, 8, 1),
+    endedAt: DateTime(2026, 10, 31),
+    weeksMet: 10,
+    totalWeeks: 13,
+  );
+}
+
 void main() {
   group('StorageService with a fake store', () {
     test('nothing saved yet loads as empty', () async {
@@ -53,7 +64,7 @@ void main() {
       await service.save(
         UserData(
           avatar: _avatar('Current'),
-          history: [_avatar('Old')],
+          history: [_record('Old')],
           cycleStart: start,
         ),
       );
@@ -61,7 +72,7 @@ void main() {
       final restored = await service.load();
 
       expect(restored.avatar?.avatarName, 'Current');
-      expect(restored.history.first.avatarName, 'Old');
+      expect(restored.history.first.avatar.avatarName, 'Old');
       expect(restored.cycleStart, start);
     });
 
@@ -129,14 +140,14 @@ void main() {
       await service.save(
         UserData(
           avatar: _avatar('Current'),
-          history: [_avatar('Old')],
+          history: [_record('Old')],
           cycleStart: start,
         ),
       );
       final restored = await service.load();
 
       expect(restored.avatar?.avatarName, 'Current');
-      expect(restored.history.first.avatarName, 'Old');
+      expect(restored.history.first.avatar.avatarName, 'Old');
       expect(restored.cycleStart, start);
     });
 

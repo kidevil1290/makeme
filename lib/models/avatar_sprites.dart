@@ -1,5 +1,6 @@
 import '../utils/enums.dart';
 import 'avatar.dart';
+import 'growth_calculator.dart';
 
 // Translates an avatar's raw muscleGrowth log into the sprite levels AvatarDisplay draws.
 // muscleGrowth is the untampered workout log (raw points that only ever increase);
@@ -11,8 +12,8 @@ class AvatarSprites {
   const AvatarSprites(this.avatar);
 
   // Raw growth that maps a muscle to the max sprite level.
-  // ADJUST WHEN GROWTH FORMULA ADDED!
-  static const double growthTarget = 100.0;
+  // Comes from the avatar's weekly goal, see GrowthCalculator.targetFor.
+  double get growthTarget => GrowthCalculator.targetFor(avatar.weeklyGoal);
 
   // Starting display level per build: athletic begins a level ahead, skinny/heavy
   // a level behind (the build-body transition), average at 0.

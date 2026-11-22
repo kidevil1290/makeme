@@ -7,7 +7,7 @@ import '../theme/theme.dart';
 import '../models/user_profile.dart';
 import '../widgets/avatar_display.dart';
 
-enum _ProfileAction { avatarSelection, logOut }
+enum _ProfileAction { avatarSelection, growthDebug, logOut }
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -162,6 +162,8 @@ class _HomeScreenState extends State<HomeScreen> {
         switch (action) {
           case _ProfileAction.avatarSelection:
             manager.setScreen(Screens.avatarSelection);
+          case _ProfileAction.growthDebug:
+            manager.setScreen(Screens.growthDebug);
           case _ProfileAction.logOut:
             manager.setScreen(Screens.login);
         }

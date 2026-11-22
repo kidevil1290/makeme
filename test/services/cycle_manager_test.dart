@@ -5,10 +5,13 @@ import 'package:makeme/models/avatar.dart';
 import 'package:makeme/models/head_config.dart';
 import 'package:makeme/services/cycle_manager.dart';
 import 'package:makeme/utils/enums.dart';
-import 'package:makeme/models/avatar_sprites.dart';
+import 'package:makeme/models/growth_calculator.dart';
 
 // Same date as the UserData tests
 final _start = DateTime(2026, 11, 19, 8, 30);
+
+// Raw growth that maxes a muscle for the sample avatar (weekly goal 3)
+final double _target = GrowthCalculator.targetFor(3);
 
 // Sample avatar with all muscles maxed
 Avatar _avatar({bool maxed = false}) {
@@ -23,7 +26,7 @@ Avatar _avatar({bool maxed = false}) {
     muscleGrowth: maxed
         ? {
             for (final part in BodyPartName.values)
-              part: AvatarSprites.growthTarget,
+              part: _target,
           }
         : {},
   );
@@ -112,7 +115,7 @@ void main() {
       final almostMaxed = _avatar().copyWith(
         muscleGrowth: {
           for (final part in BodyPartName.values.skip(1))
-            part: AvatarSprites.growthTarget,
+            part: _target,
         },
       );
 

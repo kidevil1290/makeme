@@ -6,6 +6,7 @@ import 'package:makeme/models/avatar.dart';
 import 'package:makeme/models/head_config.dart';
 import 'package:makeme/models/user_data.dart';
 import 'package:makeme/utils/enums.dart';
+import 'package:makeme/models/avatar_record.dart';
 
 // Sample avatar
 Avatar _avatar(String name) {
@@ -18,6 +19,17 @@ Avatar _avatar(String name) {
     skinColor: const Color(0xFFC68642),
     hairColor: const Color(0xFF2B1B0E),
     muscleGrowth: {BodyPartName.pects: 2.5},
+  );
+}
+
+// Sample of finished cycle
+AvatarRecord _record(String name) {
+  return AvatarRecord(
+    avatar: _avatar(name),
+    startedAt: DateTime(2026, 8, 1),
+    endedAt: DateTime(2026, 10, 31),
+    weeksMet: 10,
+    totalWeeks: 13,
   );
 }
 
@@ -44,28 +56,38 @@ void main() {
       final restored = _roundTrip(
         UserData(
           avatar: _avatar('Current'),
-          history: [_avatar('Old')],
+          history: [_record('Old')],
           cycleStart: start,
         ),
       );
 
       expect(restored.avatar?.avatarName, 'Current');
       expect(restored.history.length, 1);
-      expect(restored.history.first.avatarName, 'Old');
+      expect(restored.history.first.avatar.avatarName, 'Old');
       expect(restored.cycleStart, start);
+    });
+
+    test('a history record keeps its dates and weeks', () {
+      final restored = _roundTrip(UserData(history: [_record('Old')]));
+      final record = restored.history.single;
+
+      expect(record.startedAt, DateTime(2026, 8, 1));
+      expect(record.endedAt, DateTime(2026, 10, 31));
+      expect(record.weeksMet, 10);
+      expect(record.totalWeeks, 13);
     });
 
     test('an unreadable history record is skipped', () {
       final json = UserData(avatar: _avatar('Current')).toJson();
       json['history'] = [
-        _avatar('Good').toJson(),
+        _record('Good').toJson(),
         {'broken': true},
       ];
 
       final restored = UserData.fromJson(json);
 
       expect(restored.history.length, 1);
-      expect(restored.history.first.avatarName, 'Good');
+      expect(restored.history.first.avatar.avatarName, 'Good');
     });
 
     test('a missing avatar loads as null', () {
@@ -86,10 +108,13 @@ void main() {
 
     test('history keeps its order', () {
       final restored = _roundTrip(
-        UserData(history: [_avatar('First'), _avatar('Second')]),
+        UserData(history: [_record('First'), _record('Second')]),
       );
 
-      expect(restored.history.map((a) => a.avatarName), ['First', 'Second']);
+      expect(restored.history.map((r) => r.avatar.avatarName), [
+        'First',
+        'Second',
+      ]);
     });
 
     test('a missing history loads as empty', () {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 import '../services/screen_manager.dart';
 import '../utils/enums.dart';
@@ -7,7 +8,12 @@ import '../theme/theme.dart';
 import '../models/user_profile.dart';
 import '../widgets/avatar_display.dart';
 
-enum _ProfileAction { avatarSelection, growthDebug, logOut }
+enum _ProfileAction {
+  avatarSelection,
+  growthDebug,
+  logOut,
+  forceAscend,
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -166,15 +172,32 @@ class _HomeScreenState extends State<HomeScreen> {
             manager.setScreen(Screens.growthDebug);
           case _ProfileAction.logOut:
             manager.setScreen(Screens.login);
+          case _ProfileAction.forceAscend:
+            context.read<UserProfile>().ascend();
+            manager.setScreen(Screens.avatarSelection);
         }
       },
-      itemBuilder: (_) => const [
-        PopupMenuItem(
-          value: _ProfileAction.avatarSelection,
-          child: Text('Avatar Selection'),
-        ),
-        PopupMenuItem(value: _ProfileAction.logOut, child: Text('Log Out')),
-      ],
+      itemBuilder: (_) {
+        return [
+          const PopupMenuItem(
+            value: _ProfileAction.avatarSelection,
+            child: Text('Avatar Selection'),
+          ),
+          const PopupMenuItem(
+            value: _ProfileAction.logOut,
+            child: Text('Log Out'),
+          ),
+          const PopupMenuItem(
+            value: _ProfileAction.growthDebug,
+            child: Text('Growth Sim'),
+          ),
+          if (kDebugMode)
+            const PopupMenuItem(
+              value: _ProfileAction.forceAscend,
+              child: Text('Force Ascend'),
+            ),
+        ];
+      },
       child: Padding(
         padding: const EdgeInsets.only(right: 16),
         child: Stack(

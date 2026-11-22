@@ -10,14 +10,15 @@ import '../services/storage_service.dart';
 import '../models/user_data.dart';
 import '../models/workout_log.dart';
 import '../models/workout_template.dart';
+import '../models/avatar_record.dart';
 
-// Owns everything the user has: avatar, past avatars, workout history,
+// Owns everything the user has: avatar, finished cycles, workout history,
 // templates and the cycle. Every change is saved through StorageService.
 class UserProfile extends ChangeNotifier {
   final StorageService _storage;
   Avatar? _avatar;
   final CycleManager _cycle = CycleManager();
-  final List<Avatar> _history = [];
+  final List<AvatarRecord> _history = [];
   final List<WorkoutLogEntry> _workoutHistory = [];
   final List<WorkoutTemplate> _templates = [];
   // The template picked for the next workout, kept in memory only
@@ -50,7 +51,7 @@ class UserProfile extends ChangeNotifier {
   Avatar? get avatar => _avatar;
   bool get hasAvatar => _avatar != null;
   bool get canAscend => _cycle.canAscend;
-  List<Avatar> get history => List.unmodifiable(_history);
+  List<AvatarRecord> get history => List.unmodifiable(_history);
   List<WorkoutLogEntry> get workoutHistory =>
       List.unmodifiable(_workoutHistory);
   List<WorkoutTemplate> get templates => List.unmodifiable(_templates);
@@ -115,7 +116,7 @@ class UserProfile extends ChangeNotifier {
     final entry = WorkoutLogEntry(
       id: now.microsecondsSinceEpoch.toString(),
       durationMinutes: durationMinutes,
-      // a copy, to teh saved lists
+      // a copy, so the caller's list cannot change the saved workout
       bodyParts: List.of(bodyParts),
       intensity: intensity,
       createdAt: date ?? now,
@@ -171,11 +172,21 @@ class UserProfile extends ChangeNotifier {
     return template;
   }
 
-  // Ends the current avatar and resets the cycle
-  // and adds the avatar in history
+  // Saves the finished avatar as a record in history,
+  // then clears the avatar and resets the cycle
   void ascend() {
     final current = _avatar;
-    if (current != null) _history.add(current);
+    if (current != null) {
+      final now = DateTime.now();
+      _history.add(
+        AvatarRecord.finish(
+          avatar: current,
+          startedAt: _cycle.cycleStart ?? now,
+          endedAt: now,
+          workouts: _workoutHistory,
+        ),
+      );
+    }
     _avatar = null;
     _cycle.reset();
     _changed();
@@ -195,7 +206,7 @@ class UserProfile extends ChangeNotifier {
       await _storage.save(
         UserData(
           avatar: _avatar,
-          // a copy, so the saved list cannot change afterwards
+          // copies, so a later change to these lists cannot change this save
           history: List.of(_history),
           workoutHistory: List.of(_workoutHistory),
           templates: List.of(_templates),

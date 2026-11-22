@@ -1,6 +1,7 @@
 import 'avatar.dart';
 import 'workout_log.dart';
 import 'workout_template.dart';
+import 'avatar_record.dart';
 
 // Everything the app saves, as one immutable snapshot
 // It only holds data and converts itself to and from JSON
@@ -10,9 +11,9 @@ class UserData {
 
   final int version;
   final Avatar? avatar;
-  // past avatars from earlier cycles
-  final List<Avatar> history;
-  // every logged workout, UserProfile keeps its newest first
+  // finished cycles, one record for each ascension
+  final List<AvatarRecord> history;
+  // every logged workout, UserProfile keeps oldest first
   final List<WorkoutLogEntry> workoutHistory;
   // user's saved workout templates
   final List<WorkoutTemplate> templates;
@@ -52,7 +53,7 @@ class UserData {
       version: (json['version'] as int?) ?? currentVersion,
       // nothing is saved? then null, otherwise build the avatar
       avatar: rawAvatar == null ? null : Avatar.fromJson(rawAvatar),
-      history: _readList(json['history'], Avatar.fromJson),
+      history: _readList(json['history'], AvatarRecord.fromJson),
       workoutHistory: _readList(
         json['workoutHistory'],
         WorkoutLogEntry.fromJson,

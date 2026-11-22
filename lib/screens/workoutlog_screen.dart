@@ -81,14 +81,7 @@ class _WorkoutLogState extends State<WorkoutLog> {
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Workout logged')));
 
-    setState(() {
-      _durationController.clear();
-      _durationMinutes = null;
-      _selectedBodyParts.clear();
-      _intensity = null;
-      _templateUsed = null;
-      _formResets++;
-    });
+    context.read<ScreenManager>().setScreen(Screens.home);
   }
 
   @override

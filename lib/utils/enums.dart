@@ -8,6 +8,7 @@ enum Screens {
   workoutlog,
   template,
   status,
+  growthDebug,
 }
 
 enum Gender { male, female }

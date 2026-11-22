@@ -22,6 +22,20 @@ extension IntensityMultiplier on Intensity {
 class GrowthCalculator {
   static const double minutesPerUnit = 30;
 
+  // CALIBRATION: raw growth a muscle needs to reach the max sprite level is
+  //   target = targetPerGoalDay x weeklyGoal
+  // so the goal the user picked sets the pace: a user who hits their own goal
+  // with ~60 min moderate sessions (split across muscle groups) maxes every
+  // muscle around week 10-12 of the 13 week cycle, with a few weeks of slack.
+  // Training harder than the goal maxes earlier; training less than the goal
+  // never maxes, and the avatar ascends at day 91 instead.
+  // growth_calibration_test.dart checks this for every build and goal.
+  static const double targetPerGoalDay = 2.0;
+
+  static double targetFor(int weeklyGoal) {
+    return weeklyGoal.clamp(1, 7).toInt() * targetPerGoalDay;
+  }
+
   static double total({
     required int durationMinutes,
     required Intensity intensity,

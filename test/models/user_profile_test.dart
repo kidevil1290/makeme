@@ -6,6 +6,7 @@ import 'package:makeme/models/head_config.dart';
 import 'package:makeme/models/user_data.dart';
 import 'package:makeme/models/user_profile.dart';
 import 'package:makeme/models/workout_log.dart';
+import 'package:makeme/services/cycle_manager.dart';
 import 'package:makeme/services/storage_service.dart';
 import 'package:makeme/utils/enums.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
@@ -460,6 +461,43 @@ void main() {
       final profile = maxedProfile(UserProfile.maxAscensionLevel);
 
       expect(profile.shouldShowAscendPrompt, false);
+    });
+
+    // An avatar that never maxed, created the given number of days ago
+    UserProfile agedProfile(int days) {
+      return _profile(
+        UserData(
+          avatar: _avatar('Aged'),
+          cycleStart: DateTime.now().subtract(Duration(days: days)),
+        ),
+      );
+    }
+
+    test('an avatar can ascend after 91 days without maxing', () {
+      final profile = agedProfile(CycleManager.cycleDays);
+
+      expect(profile.isMaxed, false);
+      expect(profile.cycleComplete, true);
+      expect(profile.canAscend, true);
+      expect(profile.readyToAscend, true);
+      expect(profile.shouldShowAscendPrompt, true);
+    });
+
+    test('an avatar cannot ascend on day 90 without maxing', () {
+      final profile = agedProfile(CycleManager.cycleDays - 1);
+
+      expect(profile.cycleComplete, false);
+      expect(profile.readyToAscend, false);
+      expect(profile.shouldShowAscendPrompt, false);
+    });
+
+    test('ascending after 91 days raises the level', () {
+      final profile = agedProfile(CycleManager.cycleDays);
+
+      profile.ascend();
+
+      expect(profile.ascensionLevel, 1);
+      expect(profile.history.single.avatar.avatarName, 'Aged');
     });
   });
 }

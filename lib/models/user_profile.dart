@@ -64,7 +64,8 @@ class UserProfile extends ChangeNotifier {
   // Null until avatar creation is finished
   Avatar? get avatar => _avatar;
   bool get hasAvatar => _avatar != null;
-  bool get canAscend => _cycle.canAscend;
+  // The avatar is maxed or its 91 day cycle is over
+  bool get canAscend => isMaxed || cycleComplete;
   List<AvatarRecord> get history => List.unmodifiable(_history);
   List<WorkoutLogEntry> get workoutHistory =>
       List.unmodifiable(_workoutHistory);
@@ -77,11 +78,14 @@ class UserProfile extends ChangeNotifier {
     return current != null && AvatarSprites(current).isMaxed;
   }
 
-  // The Ascend! button shows only for a maxed avatar with a badge still to earn
-  bool get readyToAscend => isMaxed && _ascensionLevel < maxAscensionLevel;
+  // True once the current avatar's 91 day cycle is over, read from today's date
+  bool get cycleComplete => hasAvatar && _cycle.isComplete();
+
+  // The Ascend! button shows when the avatar can ascend and a badge is still to earn
+  bool get readyToAscend => canAscend && _ascensionLevel < maxAscensionLevel;
 
   // The ascension dialog is due: the avatar can ascend and has not seen it yet.
-  // A maxed avatar stays maxed, so this is once per avatar
+  // Maxed and cycle complete never turn false again, so this is once per avatar
   bool get shouldShowAscendPrompt => readyToAscend && !_ascendPromptShown;
 
   // Called by the screen when it shows the ascension dialog, so it shows only once

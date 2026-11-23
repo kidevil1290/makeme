@@ -26,6 +26,12 @@ class CycleManager {
     return (now ?? DateTime.now()).difference(start).inDays;
   }
 
+  // True once 91 days have passed, checked against the clock each time
+  // (canAscend is only recalculated in update, so it can be out of date)
+  bool isComplete([DateTime? now]) {
+    return _cycleStart != null && daysElapsed(now) >= cycleDays;
+  }
+
   // Ascension is offered when ALL of the avatar's muscles are maxed or 91 days have passed
   void update(Avatar avatar, [DateTime? now]) {
     if (_cycleStart == null) return;

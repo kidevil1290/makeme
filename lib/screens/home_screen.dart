@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
 
+import '../services/cycle_manager.dart';
 import '../services/screen_manager.dart';
 import '../utils/enums.dart';
 import '../theme/theme.dart';
@@ -175,13 +176,17 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       final profile = context.read<UserProfile>();
       if (!profile.shouldShowAscendPrompt) return;
+      // A maxed avatar gets the growth message, otherwise the 91 days are up
+      final String reason = profile.isMaxed
+          ? 'You have reached maximum muscle growth!'
+          : 'You have completed your ${CycleManager.cycleDays} day cycle!';
       profile.markAscendPromptShown();
       showDialog<void>(
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: const Text('Congratulations!'),
-          content: const Text(
-            'You have reached maximum muscle growth! If you choose to ascend, '
+          content: Text(
+            '$reason If you choose to ascend, '
             'you will create a new Avatar to replace your current Avatar. '
             'Your new Avatar will be granted the next ascension level. '
             'Each ascension level is indicated by a badge that will appear '

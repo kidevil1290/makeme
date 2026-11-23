@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' show PointerDeviceKind;
 
 class AppColors {
   static const white = Colors.white;
@@ -58,4 +59,11 @@ class NoOverscroll extends MaterialScrollBehavior {
   ) {
     return child;
   }
+
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+  };
 }

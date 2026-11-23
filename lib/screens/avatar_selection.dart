@@ -9,6 +9,7 @@ import '../services/screen_manager.dart';
 import '../theme/theme.dart';
 import '../utils/enums.dart';
 import '../widgets/avatar_display.dart';
+import '../widgets/ascension_badge.dart';
 import '../models/avatar_record.dart';
 
 // Avatar Selection screen
@@ -43,11 +44,46 @@ class AvatarSelection extends StatelessWidget {
     );
   }
 
-  // Has two states: Create Avatar and Play with avatarName
-  Widget _buildCreateButton(BuildContext context) {
-    final avatar = context.watch<UserProfile>().avatar;
-    final bool hasAvatar = context.watch<UserProfile>().hasAvatar;
+  // Largest badge scale: 6 x 48 = 288 px when the screen has room
+  static const int _maxBadgeScale = 6;
+  // Room kept under the badge for the 12 px gap and the name text
+  static const double _nameSpace = 48;
 
+  // Has three states: Create Avatar, Play with avatarName,
+  // and the ascension badge with avatarName for an avatar above level 0
+  Widget _buildCreateButton(BuildContext context) {
+    final profile = context.watch<UserProfile>();
+    final avatar = profile.avatar;
+    final bool hasAvatar = profile.hasAvatar;
+    final int level = profile.ascensionLevel;
+
+    // LayoutBuilder gives the height of the top half, so the badge can take
+    // the largest whole scale that still fits above the name (at most 6)
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final int fitScale =
+            ((constraints.maxHeight - _nameSpace) / AscensionBadge.artSize)
+                .floor();
+        final int badgeScale = fitScale.clamp(1, _maxBadgeScale);
+        return _buildCreateContent(
+          context,
+          avatar?.avatarName,
+          hasAvatar,
+          level,
+          badgeScale,
+        );
+      },
+    );
+  }
+
+  // The tappable button and the name under it
+  Widget _buildCreateContent(
+    BuildContext context,
+    String? avatarName,
+    bool hasAvatar,
+    int level,
+    int badgeScale,
+  ) {
     return Center(
       child: GestureDetector(
         onTap: () => context.read<ScreenManager>().setScreen(
@@ -57,23 +93,27 @@ class AvatarSelection extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: 12,
           children: [
-            Container(
-              width: 120,
-              height: 120,
-              decoration: const BoxDecoration(
-                color: AppColors.blue,
-                shape: BoxShape.circle,
+            // The badge replaces the Play circle, tapping it still plays
+            if (hasAvatar && level > 0)
+              AscensionBadge(level: level, scale: badgeScale)
+            else
+              Container(
+                width: 120,
+                height: 120,
+                decoration: const BoxDecoration(
+                  color: AppColors.blue,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  hasAvatar ? Icons.play_arrow : Icons.add,
+                  size: 64,
+                  color: AppColors.white,
+                ),
               ),
-              child: Icon(
-                hasAvatar ? Icons.play_arrow : Icons.add,
-                size: 64,
-                color: AppColors.white,
-              ),
-            ),
             Padding(
               padding: const EdgeInsetsGeometry.symmetric(horizontal: 24),
               child: Text(
-                avatar?.avatarName ?? 'Create Avatar',
+                avatarName ?? 'Create Avatar',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(

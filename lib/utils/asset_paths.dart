@@ -66,4 +66,15 @@ class AssetPaths {
   static String hair(Gender gender, int option, int g) {
     return '$_root/${gender.name}_hair_${option}_g$g.$_ext';
   }
+
+  // Number of ascension badges in assets/badges (badge01 to badge16).
+  // Also the highest ascension level, see UserProfile.maxAscensionLevel
+  static const int badgeCount = 16;
+
+  // Badge for an ascension level from 1 to badgeCount, two digit number.
+  // e.g. assets/badges/badge03.png
+  static String badge(int level) {
+    final int n = level.clamp(1, badgeCount);
+    return 'assets/badges/badge${n.toString().padLeft(2, '0')}.png';
+  }
 }

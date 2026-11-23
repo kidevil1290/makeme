@@ -329,4 +329,137 @@ void main() {
       expect(redraws, 0);
     });
   });
+
+  group('ascension', () {
+    // A profile whose avatar has every muscle at the growth target
+    // (athletic, goal 3 -> target 6.0), so it is maxed
+    UserProfile maxedProfile([int level = 0]) {
+      final maxed = _avatar('Maxed').copyWith(
+        muscleGrowth: {for (final part in BodyPartName.values) part: 6.0},
+      );
+      return _profile(
+        UserData(
+          avatar: maxed,
+          cycleStart: DateTime.now(),
+          ascensionLevel: level,
+        ),
+      );
+    }
+
+    test('a new user starts at ascension level 0', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      expect(profile.ascensionLevel, 0);
+    });
+
+    test('a fresh avatar is not maxed and cannot ascend', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      expect(profile.isMaxed, false);
+      expect(profile.readyToAscend, false);
+    });
+
+    test('a maxed avatar is ready to ascend', () {
+      final profile = maxedProfile();
+
+      expect(profile.isMaxed, true);
+      expect(profile.readyToAscend, true);
+    });
+
+    test('ascend raises the level and the next avatar keeps it', () {
+      final profile = maxedProfile();
+
+      profile.ascend();
+      _create(profile, 'Next');
+
+      expect(profile.ascensionLevel, 1);
+      expect(profile.avatar?.avatarName, 'Next');
+      expect(profile.avatar?.growthOf(BodyPartName.pects), 0.0);
+      expect(profile.history.single.avatar.avatarName, 'Maxed');
+    });
+
+    test('ascend without an avatar does not raise the level', () {
+      final profile = _profile();
+
+      profile.ascend();
+
+      expect(profile.ascensionLevel, 0);
+    });
+
+    test('the last badge stops ascension', () {
+      final profile = maxedProfile(UserProfile.maxAscensionLevel);
+
+      expect(profile.isMaxed, true);
+      expect(profile.readyToAscend, false);
+
+      profile.ascend();
+
+      expect(profile.ascensionLevel, UserProfile.maxAscensionLevel);
+    });
+
+    test('the ascension level survives a restart', () async {
+      final profile = maxedProfile();
+      profile.ascend();
+      await pumpEventQueue();
+
+      final restarted = _profile(await StorageService().load());
+
+      expect(restarted.ascensionLevel, 1);
+    });
+
+    test('a corrupted level is clamped into range', () {
+      final profile = _profile(const UserData(ascensionLevel: 99));
+
+      expect(profile.ascensionLevel, UserProfile.maxAscensionLevel);
+    });
+
+    test('the ascension dialog is due once the avatar maxes', () {
+      expect(maxedProfile().shouldShowAscendPrompt, true);
+    });
+
+    test('a fresh avatar has no ascension dialog', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      expect(profile.shouldShowAscendPrompt, false);
+    });
+
+    test('the ascension dialog shows only once', () {
+      final profile = maxedProfile();
+
+      profile.markAscendPromptShown();
+
+      expect(profile.shouldShowAscendPrompt, false);
+      expect(profile.readyToAscend, true);
+    });
+
+    test('a shown dialog stays shown after a restart', () async {
+      final profile = maxedProfile();
+      profile.markAscendPromptShown();
+      await pumpEventQueue();
+
+      final restarted = _profile(await StorageService().load());
+
+      expect(restarted.shouldShowAscendPrompt, false);
+    });
+
+    test('ascending clears the dialog flag for the next avatar', () async {
+      final profile = maxedProfile();
+      profile.markAscendPromptShown();
+
+      profile.ascend();
+      await pumpEventQueue();
+      final saved = await StorageService().load();
+
+      expect(saved.ascendPromptShown, false);
+    });
+
+    test('no ascension dialog at the last badge', () {
+      final profile = maxedProfile(UserProfile.maxAscensionLevel);
+
+      expect(profile.shouldShowAscendPrompt, false);
+    });
+  });
 }

@@ -10,6 +10,9 @@ import '../services/screen_manager.dart';
 import '../theme/theme.dart';
 import '../utils/enums.dart';
 import '../widgets/avatar_display.dart';
+import '../models/avatar.dart';
+import '../models/user_profile.dart';
+
 
 // Developer tool (reached from the profile menu in debug builds).
 // Replays a 91 day cycle for every build at once so the growth can be watched:
@@ -23,28 +26,41 @@ class GrowthDebugScreen extends StatefulWidget {
 }
 
 class _GrowthDebugScreenState extends State<GrowthDebugScreen> {
-  static const List<BuildType> _builds = BuildType.values;
+  static const List<BuildType> _allBuilds = BuildType.values;
+
+  // The user's real avatar: gender, head and colors all come from it
+  late final Avatar _base;
 
   SimProfile _profile = SimProfiles.onGoal;
-  Gender _gender = Gender.male;
-  int _goal = 3;
+  late int _goal;
+  bool _myBuildOnly = false;
   int _day = 0;
   Timer? _timer;
 
   // One finished 91 day run per build, rebuilt only when a setting changes
-  late Map<BuildType, List<DaySnapshot>> _runs = _simulate();
+  late Map<BuildType, List<DaySnapshot>> _runs;
 
-  Map<BuildType, List<DaySnapshot>> _simulate() {
-    return {
-      for (final build in _builds)
-        build: GrowthSimulator.run(
-          build: build,
-          profile: _profile,
-          gender: _gender,
-          weeklyGoal: _goal,
-        ),
-    };
+  List<BuildType> get _builds => _myBuildOnly ? [_base.build] : _allBuilds;
+
+  @override
+  void initState() {
+    super.initState();
+    _base = context.read<UserProfile>().avatar!;
+    _goal = _base.weeklyGoal;
+    _runs = _simulate();
   }
+
+    Map<BuildType, List<DaySnapshot>> _simulate() {
+      return {
+        for (final build in _builds)
+          build: GrowthSimulator.run(
+            base: _base,
+            profile: _profile,
+            build: build,
+            weeklyGoal: _goal,
+          ),
+      };
+    }
 
   void _resimulate(VoidCallback change) {
     setState(() {
@@ -132,16 +148,17 @@ class _GrowthDebugScreenState extends State<GrowthDebugScreen> {
                 ),
               ),
               Text('$_goal d/wk'),
-              const SizedBox(width: 8),
-              SegmentedButton<Gender>(
-                showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(value: Gender.male, label: Text('M')),
-                  ButtonSegment(value: Gender.female, label: Text('F')),
-                ],
-                selected: {_gender},
-                onSelectionChanged: (s) =>
-                    _resimulate(() => _gender = s.first),
+            ],
+          ),
+          Row(
+            children: [
+              const Expanded(child: Text('Only my build')),
+              Switch(
+                value: _myBuildOnly,
+                onChanged: (v) => _resimulate(() {
+                  _myBuildOnly = v;
+                  _day = _day.clamp(0, CycleManager.cycleDays);
+                }),
               ),
             ],
           ),
@@ -150,22 +167,17 @@ class _GrowthDebugScreenState extends State<GrowthDebugScreen> {
     );
   }
 
-  // The four builds in a row at the current day
+  // The builds in a row at the current day
   Widget _avatars() {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final double colWidth = constraints.maxWidth / _builds.length;
-        // sprites are about 1:2, leave room for the labels under each avatar
-        final double avatarWidth = (colWidth - 8)
-            .clamp(0, (constraints.maxHeight - 96) / 2)
-            .toDouble();
+        final builds = _builds;
+        final double avatarWidth = (constraints.maxWidth / builds.length) - 12;
         return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            for (final build in _builds)
-              SizedBox(
-                width: colWidth,
-                child: _column(build, avatarWidth),
-              ),
+            for (final build in builds)
+              Expanded(child: _column(build, avatarWidth)),
           ],
         );
       },
@@ -175,9 +187,8 @@ class _GrowthDebugScreenState extends State<GrowthDebugScreen> {
   Widget _column(BuildType build, double avatarWidth) {
     final DaySnapshot snap = _runs[build]![_day];
     final AvatarSprites s = snap.sprites;
-    final String stage = s.transitioning
-        ? 'body ${s.buildStage}%'
-        : 'g${s.borderLevel}';
+    final String stage =
+        s.transitioning ? 'body ${s.buildStage}%' : 'g${s.borderLevel}';
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -205,8 +216,9 @@ class _GrowthDebugScreenState extends State<GrowthDebugScreen> {
   }
 
   Widget _dayControls() {
-    final DaySnapshot ref = _runs[_builds.first]![_day];
-    final int? maxedOn = GrowthSimulator.firstMaxedDay(_runs[_builds.first]!);
+    final BuildType first = _builds.first;
+    final DaySnapshot ref = _runs[first]![_day];
+    final int? maxedOn = GrowthSimulator.firstMaxedDay(_runs[first]!);
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(8, 4, 16, 8),

@@ -6,7 +6,6 @@
 # Always work from the folder this script is in, wherever it is run from
 cd "$(dirname "$0")/release/web" || { echo "release/web not found"; exit 1; }
 
-PORT=8080
 URL="http://localhost:$PORT"
 
 # On a Mac without the Command Line Tools, /usr/bin/python3 is only a shim,

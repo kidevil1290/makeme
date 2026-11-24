@@ -1,5 +1,6 @@
 import 'avatar.dart';
 import 'workout_log.dart';
+import 'dart:math';
 
 // Record of an avatar as it ended and how the cycle went
 // Snapshot after user ascends and never changes
@@ -33,7 +34,7 @@ class AvatarRecord {
     final int startDay = _dayNumber(startedAt);
     // only whole weeks count
     // the ~/ drops the decimal from the operation
-    final int totalWeeks = (_dayNumber(endedAt) - startDay) ~/ 7;
+    final int totalWeeks = min(13, (_dayNumber(endedAt) - startDay) ~/ 7);
     // for each week the set of days the user trained on
     // A set, so two workouts on one day count as one day
     final Map<int, Set<int>> daysPerWeek = {};

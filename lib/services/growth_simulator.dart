@@ -1,8 +1,5 @@
-import 'package:flutter/material.dart';
-
 import '../models/avatar.dart';
 import '../models/avatar_sprites.dart';
-import '../models/head_config.dart';
 import '../models/workout_log.dart';
 import '../utils/enums.dart';
 import 'cycle_manager.dart';

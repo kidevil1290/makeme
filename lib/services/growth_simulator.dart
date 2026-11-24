@@ -117,19 +117,21 @@ class GrowthSimulator {
   // UTC, so whole days never shift with daylight saving
   static final DateTime cycleStart = DateTime.utc(2026, 1, 1);
 
-  static Avatar newAvatar({
-    required BuildType build,
-    Gender gender = Gender.male,
-    int weeklyGoal = 3,
+  // Fresh avatar (zero growth) that looks like [base], the user's real avatar.
+  // [build] and [weeklyGoal] can override the base values for what-if runs.
+  static Avatar newAvatar(
+    Avatar base, {
+    BuildType? build,
+    int? weeklyGoal,
   }) {
     return Avatar.start(
-      avatarName: 'Sim',
-      weeklyGoal: weeklyGoal,
-      gender: gender,
-      build: build,
-      head: const HeadConfig(),
-      skinColor: const Color(0xFFE0B090),
-      hairColor: const Color(0xFF3B2A20),
+      avatarName: base.avatarName,
+      weeklyGoal: weeklyGoal ?? base.weeklyGoal,
+      gender: base.gender,
+      build: build ?? base.build,
+      head: base.head,
+      skinColor: base.skinColor,
+      hairColor: base.hairColor,
     );
   }
 
@@ -137,16 +139,16 @@ class GrowthSimulator {
   // ascension is offered no matter what). Workouts only happen on days before
   // [days], because day 91 is the first day of the next cycle.
   static List<DaySnapshot> run({
-    required BuildType build,
+    required Avatar base,
     required SimProfile profile,
-    Gender gender = Gender.male,
-    int weeklyGoal = 3,
+    BuildType? build,
+    int? weeklyGoal,
     int days = CycleManager.cycleDays,
   }) {
     final cycle = CycleManager()..startCycle(cycleStart);
     final sessionDays = profile.weekDays.toSet();
 
-    var avatar = newAvatar(build: build, gender: gender, weeklyGoal: weeklyGoal);
+    var avatar = newAvatar(base, build: build, weeklyGoal: weeklyGoal);
     var sessions = 0;
     final snapshots = <DaySnapshot>[];
 

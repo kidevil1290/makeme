@@ -1,8 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 import 'package:makeme/models/avatar.dart';
 import 'package:makeme/services/cycle_manager.dart';
 import 'package:makeme/services/growth_simulator.dart';
 import 'package:makeme/utils/enums.dart';
+import 'package:makeme/models/head_config.dart';
+
+
+Avatar testAvatar({BuildType build = BuildType.average, int weeklyGoal = 3}) {
+  return Avatar.start(
+    avatarName: 'Sim',
+    weeklyGoal: weeklyGoal,
+    gender: Gender.male,
+    build: build,
+    head: const HeadConfig(),
+    skinColor: const Color(0xFFE0B090),
+    hairColor: const Color(0xFF3B2A20),
+  );
+}
 
 // 60 minute moderate sessions on exactly the days the goal asks for
 SimProfile _onGoal(int goal) => SimProfile(
@@ -17,7 +32,7 @@ void main() {
   group('GrowthSimulator basics', () {
     test('runs day 0 to day 91', () {
       final run = GrowthSimulator.run(
-        build: BuildType.average,
+        base: testAvatar(),
         profile: SimProfiles.onGoal,
       );
 
@@ -34,6 +49,7 @@ void main() {
 
     test('13 weeks of 3 sessions is 39 workouts, none on day 91', () {
       final run = GrowthSimulator.run(
+        base: testAvatar(),
         build: BuildType.average,
         profile: SimProfiles.onGoal,
       );
@@ -46,6 +62,7 @@ void main() {
       // push day: 2.0 / 4 muscles = 0.5 each, 13 push days in 13 weeks
       // legs day: 2.0 / 3 muscles = 0.67 each (rounded), 13 leg days
       final avatar = GrowthSimulator.run(
+        base: testAvatar(),
         build: BuildType.average,
         profile: SimProfiles.onGoal,
       ).last.avatar;
@@ -61,6 +78,7 @@ void main() {
         for (final goal in [1, 3, 7]) {
           test('${build.name}, ${profile.name}, goal $goal', () {
             final run = GrowthSimulator.run(
+              base: testAvatar(),
               build: build,
               profile: profile,
               weeklyGoal: goal,
@@ -116,6 +134,7 @@ void main() {
     test('skinny and heavy pass through both stages before maxing', () {
       for (final build in [BuildType.skinny, BuildType.heavy]) {
         final run = GrowthSimulator.run(
+          base: testAvatar(),
           build: build,
           profile: SimProfiles.onGoal,
         );
@@ -136,6 +155,7 @@ void main() {
     test('average and athletic never show a build body', () {
       for (final build in [BuildType.average, BuildType.athletic]) {
         final run = GrowthSimulator.run(
+          base: testAvatar(),
           build: build,
           profile: SimProfiles.onGoal,
         );
@@ -152,6 +172,7 @@ void main() {
 
         for (final build in BuildType.values) {
           final run = GrowthSimulator.run(
+            base: testAvatar(),
             build: build,
             profile: _onGoal(goal),
             weeklyGoal: goal,
@@ -174,10 +195,11 @@ void main() {
     test('training above the goal maxes earlier, but not instantly', () {
       for (final build in BuildType.values) {
         final onGoal = GrowthSimulator.firstMaxedDay(
-          GrowthSimulator.run(build: build, profile: SimProfiles.onGoal),
+          GrowthSimulator.run(base: testAvatar(),build: build, profile: SimProfiles.onGoal),
         )!;
         final over = GrowthSimulator.firstMaxedDay(
-          GrowthSimulator.run(build: build, profile: SimProfiles.overAchiever),
+          GrowthSimulator.run(
+            base: testAvatar(),build: build, profile: SimProfiles.overAchiever),
         )!;
 
         expect(over, lessThan(onGoal));
@@ -188,6 +210,7 @@ void main() {
     test('training below the goal never maxes, ascends on day 91', () {
       for (final build in BuildType.values) {
         final run = GrowthSimulator.run(
+          base: testAvatar(),
           build: build,
           profile: SimProfiles.casual,
         );
@@ -202,7 +225,7 @@ void main() {
     test('nobody can ascend on day 0', () {
       for (final build in BuildType.values) {
         for (final profile in SimProfiles.all) {
-          final run = GrowthSimulator.run(build: build, profile: profile);
+          final run = GrowthSimulator.run(base: testAvatar(),build: build, profile: profile);
 
           expect(run.first.canAscend, false);
         }

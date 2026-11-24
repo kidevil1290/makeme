@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() => _selectedTab = index);
           final Screens target = switch (index) {
             0 => Screens.home,
-            1 => Screens.notImplemented,
+            1 => Screens.habitLogger,
             _ => Screens.status,
           };
           context.read<ScreenManager>().setScreen(target);

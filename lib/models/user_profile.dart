@@ -24,9 +24,6 @@ class UserProfile extends ChangeNotifier {
   // 0 for the first avatar, +1 each time an avatar ascends.
   // Kept here, not on the Avatar, so the next avatar the user creates inherits it
   int _ascensionLevel = 0;
-  // True once the "you can ascend" dialog was shown for the current avatar.
-  // Saved, so the dialog does not come back after a restart
-  bool _ascendPromptShown = false;
   Avatar? _avatar;
   final CycleManager _cycle = CycleManager();
   final List<AvatarRecord> _history = [];
@@ -46,7 +43,6 @@ class UserProfile extends ChangeNotifier {
     _templates.addAll(data.templates);
     // clamped as a safeguard for a corrupted save
     _ascensionLevel = data.ascensionLevel.clamp(0, maxAscensionLevel);
-    _ascendPromptShown = data.ascendPromptShown;
     _cycle.restore(data.cycleStart, data.avatar);
 
     // An avatar with no cycle could never ascend, for example when the saved
@@ -64,34 +60,37 @@ class UserProfile extends ChangeNotifier {
   // Null until avatar creation is finished
   Avatar? get avatar => _avatar;
   bool get hasAvatar => _avatar != null;
-  // The avatar is maxed or its 91 day cycle is over
-  bool get canAscend => isMaxed || cycleComplete;
+  // CycleManager decides: the avatar is maxed or its 91 day cycle is over.
+  // Home forces the ascension while this is true
+  bool get canAscend => hasAvatar && _cycle.canAscend;
+  // Why ascension is due: true for maxed muscles, false for the end of the cycle
+  bool get isMaxed => hasAvatar && _cycle.isMaxed;
   List<AvatarRecord> get history => List.unmodifiable(_history);
   List<WorkoutLogEntry> get workoutHistory =>
       List.unmodifiable(_workoutHistory);
   List<WorkoutTemplate> get templates => List.unmodifiable(_templates);
   int get ascensionLevel => _ascensionLevel;
 
-  // True when every muscle region of the current avatar is at the top sprite level
-  bool get isMaxed {
-    final current = _avatar;
-    return current != null && AvatarSprites(current).isMaxed;
+  // True when the next ascension will not raise the level (last badge reached)
+  bool get atMaxAscension => _ascensionLevel >= maxAscensionLevel;
+
+  // For demos and testing.
+  // Ends the 91 day cycle now, so Home shows the "completed your cycle" dialog.
+  // Saved like a real cycle end, so it also survives a restart
+  void forceEndCycle() {
+    if (_avatar == null) return;
+    _cycle.forceComplete();
+    _changed();
   }
 
-  // True once the current avatar's 91 day cycle is over, read from today's date
-  bool get cycleComplete => hasAvatar && _cycle.isComplete();
-
-  // The Ascend! button shows when the avatar can ascend and a badge is still to earn
-  bool get readyToAscend => canAscend && _ascensionLevel < maxAscensionLevel;
-
-  // The ascension dialog is due: the avatar can ascend and has not seen it yet.
-  // Maxed and cycle complete never turn false again, so this is once per avatar
-  bool get shouldShowAscendPrompt => readyToAscend && !_ascendPromptShown;
-
-  // Called by the screen when it shows the ascension dialog, so it shows only once
-  void markAscendPromptShown() {
-    if (_ascendPromptShown) return;
-    _ascendPromptShown = true;
+  // For demos and testing.
+  // Adds the growth AvatarSprites says is missing, so the avatar is maxed and
+  // Home shows the "maximum muscle growth" dialog. The growth is saved,
+  // so it also survives a restart
+  void forceMaxed() {
+    final current = _avatar;
+    if (current == null) return;
+    if (!_applyGrowth(AvatarSprites(current).growthToMax())) return;
     _changed();
   }
 
@@ -116,8 +115,6 @@ class UserProfile extends ChangeNotifier {
       skinColor: skinColor,
       hairColor: hairColor,
     );
-    // a new avatar gets its own ascension dialog once it maxes
-    _ascendPromptShown = false;
     _cycle.startCycle();
     _changed();
   }
@@ -215,7 +212,7 @@ class UserProfile extends ChangeNotifier {
 
   // Saves the finished avatar as a record in history, raises the ascension
   // level by 1 (up to the max) for the next avatar, then clears the avatar
-  // and resets the cycle. The screen decides when this is allowed (readyToAscend)
+  // and resets the cycle. Home calls it when canAscend is true
   void ascend() {
     final current = _avatar;
     if (current != null) {
@@ -231,7 +228,6 @@ class UserProfile extends ChangeNotifier {
       );
     }
     _avatar = null;
-    _ascendPromptShown = false;
     _cycle.reset();
     _changed();
   }
@@ -256,7 +252,6 @@ class UserProfile extends ChangeNotifier {
           templates: List.of(_templates),
           cycleStart: _cycle.cycleStart,
           ascensionLevel: _ascensionLevel,
-          ascendPromptShown: _ascendPromptShown,
         ),
       );
     } catch (err) {

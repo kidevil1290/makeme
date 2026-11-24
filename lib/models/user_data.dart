@@ -21,8 +21,6 @@ class UserData {
   final DateTime? cycleStart;
   // how many times the user has ascended, carried over to the next avatar
   final int ascensionLevel;
-  // true once the "you can ascend" dialog was shown for the current avatar
-  final bool ascendPromptShown;
 
   const UserData({
     this.version = currentVersion,
@@ -32,7 +30,6 @@ class UserData {
     this.templates = const [],
     this.cycleStart,
     this.ascensionLevel = 0,
-    this.ascendPromptShown = false,
   });
 
   // What a fresh install loads: no avatar, no history, no cycle
@@ -49,7 +46,6 @@ class UserData {
       // converts DateTime to format "2026-11-20T08:30:00.000"
       'cycleStart': cycleStart?.toIso8601String(),
       'ascensionLevel': ascensionLevel,
-      'ascendPromptShown': ascendPromptShown,
     };
   }
 
@@ -72,8 +68,6 @@ class UserData {
       cycleStart: rawStart == null ? null : DateTime.tryParse(rawStart),
       // saves from before ascension levels existed have no value: start at 0
       ascensionLevel: (json['ascensionLevel'] as int?) ?? 0,
-      // missing means the dialog was never shown
-      ascendPromptShown: (json['ascendPromptShown'] as bool?) ?? false,
     );
   }
 

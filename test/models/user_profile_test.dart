@@ -347,6 +347,16 @@ void main() {
       );
     }
 
+    // An avatar that never maxed, created the given number of days ago
+    UserProfile agedProfile(int days) {
+      return _profile(
+        UserData(
+          avatar: _avatar('Aged'),
+          cycleStart: DateTime.now().subtract(Duration(days: days)),
+        ),
+      );
+    }
+
     test('a new user starts at ascension level 0', () {
       final profile = _profile();
       _create(profile, 'Created');
@@ -359,14 +369,56 @@ void main() {
       _create(profile, 'Created');
 
       expect(profile.isMaxed, false);
-      expect(profile.readyToAscend, false);
+      expect(profile.canAscend, false);
     });
 
-    test('a maxed avatar is ready to ascend', () {
+    test('a maxed avatar must ascend', () {
       final profile = maxedProfile();
 
       expect(profile.isMaxed, true);
-      expect(profile.readyToAscend, true);
+      expect(profile.canAscend, true);
+    });
+
+    test('logging a workout that maxes the avatar makes it ascend', () {
+      final profile = _profile();
+      _create(profile, 'Created');
+
+      // 4 h heavy on one muscle = 12 points, past the 6.0 target
+      for (final part in BodyPartName.values) {
+        profile.addWorkout(
+          durationMinutes: 240,
+          bodyParts: [part],
+          intensity: Intensity.heavy,
+        );
+      }
+
+      expect(profile.isMaxed, true);
+      expect(profile.canAscend, true);
+    });
+
+    test('an avatar must ascend after 91 days without maxing', () {
+      final profile = agedProfile(CycleManager.cycleDays);
+
+      expect(profile.isMaxed, false);
+      expect(profile.canAscend, true);
+    });
+
+    test('an avatar cannot ascend on day 90 without maxing', () {
+      expect(agedProfile(CycleManager.cycleDays - 1).canAscend, false);
+    });
+
+    test('a due ascension is still due after a restart', () async {
+      final profile = agedProfile(CycleManager.cycleDays);
+      profile.addWorkout(
+        durationMinutes: 30,
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.light,
+      );
+      await pumpEventQueue();
+
+      final restarted = _profile(await StorageService().load());
+
+      expect(restarted.canAscend, true);
     });
 
     test('ascend raises the level and the next avatar keeps it', () {
@@ -376,9 +428,19 @@ void main() {
       _create(profile, 'Next');
 
       expect(profile.ascensionLevel, 1);
+      expect(profile.canAscend, false);
       expect(profile.avatar?.avatarName, 'Next');
       expect(profile.avatar?.growthOf(BodyPartName.pects), 0.0);
       expect(profile.history.single.avatar.avatarName, 'Maxed');
+    });
+
+    test('ascending after 91 days raises the level', () {
+      final profile = agedProfile(CycleManager.cycleDays);
+
+      profile.ascend();
+
+      expect(profile.ascensionLevel, 1);
+      expect(profile.history.single.avatar.avatarName, 'Aged');
     });
 
     test('ascend without an avatar does not raise the level', () {
@@ -389,15 +451,16 @@ void main() {
       expect(profile.ascensionLevel, 0);
     });
 
-    test('the last badge stops ascension', () {
+    test('at the last badge the avatar still ascends but keeps the level', () {
       final profile = maxedProfile(UserProfile.maxAscensionLevel);
 
-      expect(profile.isMaxed, true);
-      expect(profile.readyToAscend, false);
+      expect(profile.canAscend, true);
+      expect(profile.atMaxAscension, true);
 
       profile.ascend();
 
       expect(profile.ascensionLevel, UserProfile.maxAscensionLevel);
+      expect(profile.history.single.avatar.avatarName, 'Maxed');
     });
 
     test('the ascension level survives a restart', () async {
@@ -416,88 +479,38 @@ void main() {
       expect(profile.ascensionLevel, UserProfile.maxAscensionLevel);
     });
 
-    test('the ascension dialog is due once the avatar maxes', () {
-      expect(maxedProfile().shouldShowAscendPrompt, true);
+    test('forceMaxed maxes the avatar and survives a restart', () async {
+      final profile = _profile();
+      _create(profile, 'Created');
+      profile.addWorkout(
+        durationMinutes: 30,
+        bodyParts: [BodyPartName.pects],
+        intensity: Intensity.light,
+      );
+      final double pectsBefore = profile.avatar!.growthOf(BodyPartName.pects);
+
+      profile.forceMaxed();
+      await pumpEventQueue();
+      final restarted = _profile(await StorageService().load());
+
+      expect(profile.isMaxed, true);
+      expect(profile.canAscend, true);
+      expect(profile.avatar!.growthOf(BodyPartName.pects) > pectsBefore, true);
+      expect(restarted.isMaxed, true);
+      expect(restarted.canAscend, true);
     });
 
-    test('a fresh avatar has no ascension dialog', () {
+    test('forceEndCycle ends the cycle and survives a restart', () async {
       final profile = _profile();
       _create(profile, 'Created');
 
-      expect(profile.shouldShowAscendPrompt, false);
-    });
-
-    test('the ascension dialog shows only once', () {
-      final profile = maxedProfile();
-
-      profile.markAscendPromptShown();
-
-      expect(profile.shouldShowAscendPrompt, false);
-      expect(profile.readyToAscend, true);
-    });
-
-    test('a shown dialog stays shown after a restart', () async {
-      final profile = maxedProfile();
-      profile.markAscendPromptShown();
+      profile.forceEndCycle();
       await pumpEventQueue();
-
       final restarted = _profile(await StorageService().load());
 
-      expect(restarted.shouldShowAscendPrompt, false);
-    });
-
-    test('ascending clears the dialog flag for the next avatar', () async {
-      final profile = maxedProfile();
-      profile.markAscendPromptShown();
-
-      profile.ascend();
-      await pumpEventQueue();
-      final saved = await StorageService().load();
-
-      expect(saved.ascendPromptShown, false);
-    });
-
-    test('no ascension dialog at the last badge', () {
-      final profile = maxedProfile(UserProfile.maxAscensionLevel);
-
-      expect(profile.shouldShowAscendPrompt, false);
-    });
-
-    // An avatar that never maxed, created the given number of days ago
-    UserProfile agedProfile(int days) {
-      return _profile(
-        UserData(
-          avatar: _avatar('Aged'),
-          cycleStart: DateTime.now().subtract(Duration(days: days)),
-        ),
-      );
-    }
-
-    test('an avatar can ascend after 91 days without maxing', () {
-      final profile = agedProfile(CycleManager.cycleDays);
-
-      expect(profile.isMaxed, false);
-      expect(profile.cycleComplete, true);
       expect(profile.canAscend, true);
-      expect(profile.readyToAscend, true);
-      expect(profile.shouldShowAscendPrompt, true);
-    });
-
-    test('an avatar cannot ascend on day 90 without maxing', () {
-      final profile = agedProfile(CycleManager.cycleDays - 1);
-
-      expect(profile.cycleComplete, false);
-      expect(profile.readyToAscend, false);
-      expect(profile.shouldShowAscendPrompt, false);
-    });
-
-    test('ascending after 91 days raises the level', () {
-      final profile = agedProfile(CycleManager.cycleDays);
-
-      profile.ascend();
-
-      expect(profile.ascensionLevel, 1);
-      expect(profile.history.single.avatar.avatarName, 'Aged');
+      expect(profile.isMaxed, false);
+      expect(restarted.canAscend, true);
     });
   });
 }

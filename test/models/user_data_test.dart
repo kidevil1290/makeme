@@ -143,18 +143,5 @@ void main() {
 
       expect(UserData.fromJson(json).ascensionLevel, 0);
     });
-
-    test('the ascension dialog flag survives a round trip', () {
-      final restored = _roundTrip(const UserData(ascendPromptShown: true));
-
-      expect(restored.ascendPromptShown, true);
-    });
-
-    test('a save without the dialog flag loads as not shown', () {
-      final json = const UserData.empty().toJson();
-      json.remove('ascendPromptShown');
-
-      expect(UserData.fromJson(json).ascendPromptShown, false);
-    });
   });
 }

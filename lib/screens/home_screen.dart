@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/foundation.dart' show kDebugMode;
 
 import '../services/cycle_manager.dart';
 import '../services/screen_manager.dart';
@@ -14,7 +13,8 @@ enum _ProfileAction {
   avatarSelection,
   growthDebug,
   logOut,
-  forceAscend,
+  avatarEndCycle,
+  avatarToMax,
 }
 
 class HomeScreen extends StatefulWidget {
@@ -26,14 +26,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedTab = 0;
-  // Stops the ascension dialog from being scheduled twice before it opens
-  bool _ascendPromptScheduled = false;
+  // Stops the ascension dialog from opening twice while it is scheduled or open
+  bool _ascendPromptOpen = false;
 
   @override
   Widget build(BuildContext context) {
     final profile = context.watch<UserProfile>();
-    // First time this avatar can ascend: explain it with a dialog
-    if (profile.shouldShowAscendPrompt) _scheduleAscendPrompt();
+    // The cycle is over: the user must ascend before doing anything else.
+    // Checked on every build, so it comes back after a restart
+    if (profile.canAscend) _scheduleAscendPrompt();
 
     return Scaffold(
       appBar: AppBar(
@@ -48,11 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _buildTabBar(),
             Expanded(child: _buildHeroSection()),
-            // Only for a maxed avatar that still has a badge to earn
-            if (profile.readyToAscend) ...[
-              _buildAscendButton(),
-              const SizedBox(height: 12),
-            ],
             _buildStartButton(),
             const SizedBox(height: 24),
           ],
@@ -166,95 +162,75 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // A dialog cannot open while the screen is being built,
-  // so it opens right after this frame is drawn.
-  // It is marked as shown first, so it never appears twice for the same avatar
+  // so it opens right after this frame is drawn
   void _scheduleAscendPrompt() {
-    if (_ascendPromptScheduled) return;
-    _ascendPromptScheduled = true;
+    if (_ascendPromptOpen) return;
+    _ascendPromptOpen = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ascendPromptScheduled = false;
-      if (!mounted) return;
-      final profile = context.read<UserProfile>();
-      if (!profile.shouldShowAscendPrompt) return;
-      // A maxed avatar gets the growth message, otherwise the 91 days are up
-      final String reason = profile.isMaxed
-          ? 'You have reached maximum muscle growth!'
-          : 'You have completed your ${CycleManager.cycleDays} day cycle!';
-      profile.markAscendPromptShown();
-      showDialog<void>(
-        context: context,
-        builder: (dialogContext) => AlertDialog(
-          title: const Text('Congratulations!'),
-          content: Text(
-            '$reason If you choose to ascend, '
-            'you will create a new Avatar to replace your current Avatar. '
-            'Your new Avatar will be granted the next ascension level. '
-            'Each ascension level is indicated by a badge that will appear '
-            'next to your Avatar.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
+      if (!mounted || !context.read<UserProfile>().canAscend) {
+        _ascendPromptOpen = false;
+        return;
+      }
+      _showAscendPrompt();
     });
   }
 
-  // Asks before ascending, because the avatar moves to history and cannot come back.
-  // Only ascends when the user taps Ascend in the dialog
-  Future<void> _confirmAscend() async {
-    final bool? confirmed = await showDialog<bool>(
+  // The forced ascension: no Cancel button, tapping outside and the back
+  // gesture do nothing, so Ascend! is the only way out
+  Future<void> _showAscendPrompt() async {
+    final profile = context.read<UserProfile>();
+    // A maxed avatar gets the growth message, otherwise the 91 days are up
+    final String reason = profile.isMaxed
+        ? 'You have reached maximum muscle growth!'
+        : 'You have completed your ${CycleManager.cycleDays} day cycle!';
+    // At the last badge the level cannot rise, so the new avatar keeps it
+    final String reward = profile.atMaxAscension
+        ? 'You already hold the highest ascension level, so your new Avatar '
+              'will keep your current badge.'
+        : 'Your new Avatar will be granted the next ascension level. '
+              'Each ascension level is indicated by a badge that will appear '
+              'next to your Avatar.';
+
+    await showDialog<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Are you sure?'),
-        content: const Text(
-          'Your avatar will move to history and you will create a new one. '
-          'This cannot be undone.',
+      barrierDismissible: false,
+      builder: (dialogContext) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          // Gold dialog for the ascension; surfaceTintColor off so
+          // Material 3 does not tint the gold
+          backgroundColor: AppColors.gold,
+          surfaceTintColor: Colors.transparent,
+          title: const Text('Congratulations!'),
+          content: Text(
+            '$reason Your Avatar will now ascend and move to your history, '
+            'and you will create a new Avatar. $reward',
+          ),
+          actions: [
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pop(dialogContext),
+              // Navy with gold text, so the button stands out on the gold dialog
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.header,
+                foregroundColor: AppColors.gold,
+              ),
+              icon: const Icon(Icons.keyboard_double_arrow_up),
+              label: const Text(
+                'Ascend!',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              iconAlignment: IconAlignment.end,
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Ascend'),
-          ),
-        ],
       ),
     );
-    // Closing the dialog by tapping outside it gives null, treated as cancel
-    if (confirmed != true || !mounted) return;
+
+    _ascendPromptOpen = false;
+    if (!mounted) return;
+    // The dialog only closes through Ascend!, so ascend now
     context.read<UserProfile>().ascend();
     context.read<ScreenManager>().setScreen(Screens.avatarCreation);
-  }
-
-  // Archives the maxed avatar, raises the ascension level and
-  // sends the user to create the next avatar (after the confirm dialog)
-  Widget _buildAscendButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: SizedBox(
-        width: double.infinity,
-        height: 64,
-        child: ElevatedButton.icon(
-          onPressed: _confirmAscend,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.gold,
-            foregroundColor: AppColors.header,
-          ),
-          icon: const Icon(Icons.keyboard_double_arrow_up),
-          label: const Text(
-            'Ascend!',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          iconAlignment: IconAlignment.end,
-        ),
-      ),
-    );
   }
 
   // Start button on the bottom
@@ -292,10 +268,12 @@ class _HomeScreenState extends State<HomeScreen> {
             manager.setScreen(Screens.growthDebug);
           case _ProfileAction.logOut:
             manager.setScreen(Screens.login);
-          // Same as Ascend! but skips the maxed check, for testing badges
-          case _ProfileAction.forceAscend:
-            context.read<UserProfile>().ascend();
-            manager.setScreen(Screens.avatarCreation);
+          // Demo: ascension by the 91 day cycle
+          case _ProfileAction.avatarEndCycle:
+            context.read<UserProfile>().forceEndCycle();
+          // Demo: ascension by maximum muscle growth
+          case _ProfileAction.avatarToMax:
+            context.read<UserProfile>().forceMaxed();
         }
       },
       itemBuilder: (_) {
@@ -312,11 +290,15 @@ class _HomeScreenState extends State<HomeScreen> {
             value: _ProfileAction.growthDebug,
             child: Text('Growth Sim'),
           ),
-          if (kDebugMode)
-            const PopupMenuItem(
-              value: _ProfileAction.forceAscend,
-              child: Text('Force Ascend'),
-            ),
+          // Shown in every build, kept for demos and testing
+          const PopupMenuItem(
+            value: _ProfileAction.avatarEndCycle,
+            child: Text('Force End Cycle'),
+          ),
+          const PopupMenuItem(
+            value: _ProfileAction.avatarToMax,
+            child: Text('Force Maxed Avatar'),
+          ),
         ];
       },
       child: Padding(

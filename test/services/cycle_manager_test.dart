@@ -123,6 +123,26 @@ void main() {
       expect(cycle.canAscend, false);
     });
 
+    test('day 91 counts with the real clock even without a new update', () {
+      final cycle = CycleManager();
+      final longAgo = DateTime.now().subtract(
+        const Duration(days: CycleManager.cycleDays),
+      );
+      cycle.startCycle(longAgo);
+
+      // no update() call: canAscend still sees the cycle is over
+      expect(cycle.canAscend, true);
+      expect(cycle.isMaxed, false);
+    });
+
+    test('a maxed avatar reports isMaxed', () {
+      final cycle = CycleManager();
+      cycle.startCycle(_start);
+
+      cycle.update(_avatar(maxed: true), _start);
+      expect(cycle.isMaxed, true);
+    });
+
     test('checks edge case before 91', () {
       final cycle = CycleManager();
       cycle.startCycle(_start);

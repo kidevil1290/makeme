@@ -8,6 +8,7 @@ class AppColors {
 
   static const blue = Color(0xFF3F63B8); //blue
   static const background = Color(0xFFDCE6F8); //paleblue
+  static const gold = Color(0xFFF2B705); //Ascend! button
 }
 
 // Builds the ThemeData given to MaterialApp

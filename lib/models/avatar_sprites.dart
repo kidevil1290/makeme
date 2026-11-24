@@ -86,4 +86,15 @@ class AvatarSprites {
   // True when every region has reached the highest level (used by CycleManager).
   bool get isMaxed =>
       AvatarRegion.values.every((region) => regionStep(region) >= Avatar.maxLevel);
+
+  // The raw growth each muscle still needs to reach the highest level, so adding
+  // it makes isMaxed true. Muscles already at the target are left out, because
+  // the raw log only ever grows (used by UserProfile.forceMaxed).
+  Map<BodyPartName, double> growthToMax() {
+    return {
+      for (final part in BodyPartName.values)
+        if (avatar.growthOf(part) < growthTarget)
+          part: growthTarget - avatar.growthOf(part),
+    };
+  }
 }

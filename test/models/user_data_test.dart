@@ -130,5 +130,18 @@ void main() {
 
       expect(UserData.fromJson(json).cycleStart, isNull);
     });
+
+    test('the ascension level survives a round trip', () {
+      final restored = _roundTrip(const UserData(ascensionLevel: 3));
+
+      expect(restored.ascensionLevel, 3);
+    });
+
+    test('a save without an ascension level loads as 0', () {
+      final json = const UserData.empty().toJson();
+      json.remove('ascensionLevel');
+
+      expect(UserData.fromJson(json).ascensionLevel, 0);
+    });
   });
 }

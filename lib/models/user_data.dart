@@ -19,6 +19,8 @@ class UserData {
   final List<WorkoutTemplate> templates;
   // when the current cycle began, CycleManager keeps the live copy
   final DateTime? cycleStart;
+  // how many times the user has ascended, carried over to the next avatar
+  final int ascensionLevel;
 
   const UserData({
     this.version = currentVersion,
@@ -27,6 +29,7 @@ class UserData {
     this.workoutHistory = const [],
     this.templates = const [],
     this.cycleStart,
+    this.ascensionLevel = 0,
   });
 
   // What a fresh install loads: no avatar, no history, no cycle
@@ -42,6 +45,7 @@ class UserData {
       'templates': templates.map((t) => t.toJson()).toList(),
       // converts DateTime to format "2026-11-20T08:30:00.000"
       'cycleStart': cycleStart?.toIso8601String(),
+      'ascensionLevel': ascensionLevel,
     };
   }
 
@@ -62,6 +66,8 @@ class UserData {
       // returns null for unreadable text instead of throwing
       // safeguard for bad Date that could wipe all progress
       cycleStart: rawStart == null ? null : DateTime.tryParse(rawStart),
+      // saves from before ascension levels existed have no value: start at 0
+      ascensionLevel: (json['ascensionLevel'] as int?) ?? 0,
     );
   }
 

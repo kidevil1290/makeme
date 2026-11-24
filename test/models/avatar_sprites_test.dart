@@ -125,6 +125,46 @@ void main() {
 
       expect(AvatarSprites(almost).isMaxed, false);
     });
+
+    test('adding growthToMax maxes every build and goal', () {
+      for (final build in BuildType.values) {
+        for (int goal = 1; goal <= 7; goal++) {
+          var avatar = _avatar(
+            build,
+            all: 1.0,
+            only: {BodyPartName.pects: 20.0},
+            weeklyGoal: goal,
+          );
+          AvatarSprites(avatar).growthToMax().forEach((part, amount) {
+            avatar = avatar.addGrowth(part, amount);
+          });
+
+          expect(
+            AvatarSprites(avatar).isMaxed,
+            true,
+            reason: '${build.name} goal $goal',
+          );
+        }
+      }
+    });
+
+    test('growthToMax only lists muscles below the target', () {
+      final sprites = AvatarSprites(
+        _avatar(
+          BuildType.average,
+          all: target,
+          only: {BodyPartName.triceps: 1.5},
+        ),
+      );
+
+      expect(sprites.growthToMax(), {BodyPartName.triceps: target - 1.5});
+    });
+
+    test('a maxed avatar needs no more growth', () {
+      final sprites = AvatarSprites(_avatar(BuildType.heavy, all: target * 2));
+
+      expect(sprites.growthToMax(), isEmpty);
+    });
   });
 
   group('AvatarSprites weekly goal', () {

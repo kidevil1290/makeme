@@ -11,11 +11,19 @@ import '../models/user_data.dart';
 import '../models/workout_log.dart';
 import '../models/workout_template.dart';
 import '../models/avatar_record.dart';
+import '../models/avatar_sprites.dart';
+import '../utils/asset_paths.dart';
 
 // Owns everything the user has: avatar, finished cycles, workout history,
-// templates and the cycle. Every change is saved through StorageService.
+// templates, the cycle and the ascension level. Every change is saved through StorageService.
 class UserProfile extends ChangeNotifier {
+  // Highest ascension level: one badge per level, the last badge is the max
+  static const int maxAscensionLevel = AssetPaths.badgeCount;
+
   final StorageService _storage;
+  // 0 for the first avatar, +1 each time an avatar ascends.
+  // Kept here, not on the Avatar, so the next avatar the user creates inherits it
+  int _ascensionLevel = 0;
   Avatar? _avatar;
   final CycleManager _cycle = CycleManager();
   final List<AvatarRecord> _history = [];
@@ -33,6 +41,8 @@ class UserProfile extends ChangeNotifier {
     _history.addAll(data.history);
     _workoutHistory.addAll(data.workoutHistory);
     _templates.addAll(data.templates);
+    // clamped as a safeguard for a corrupted save
+    _ascensionLevel = data.ascensionLevel.clamp(0, maxAscensionLevel);
     _cycle.restore(data.cycleStart, data.avatar);
 
     // An avatar with no cycle could never ascend, for example when the saved
@@ -50,11 +60,39 @@ class UserProfile extends ChangeNotifier {
   // Null until avatar creation is finished
   Avatar? get avatar => _avatar;
   bool get hasAvatar => _avatar != null;
-  bool get canAscend => _cycle.canAscend;
+  // CycleManager decides: the avatar is maxed or its 91 day cycle is over.
+  // Home forces the ascension while this is true
+  bool get canAscend => hasAvatar && _cycle.canAscend;
+  // Why ascension is due: true for maxed muscles, false for the end of the cycle
+  bool get isMaxed => hasAvatar && _cycle.isMaxed;
   List<AvatarRecord> get history => List.unmodifiable(_history);
   List<WorkoutLogEntry> get workoutHistory =>
       List.unmodifiable(_workoutHistory);
   List<WorkoutTemplate> get templates => List.unmodifiable(_templates);
+  int get ascensionLevel => _ascensionLevel;
+
+  // True when the next ascension will not raise the level (last badge reached)
+  bool get atMaxAscension => _ascensionLevel >= maxAscensionLevel;
+
+  // For demos and testing.
+  // Ends the 91 day cycle now, so Home shows the "completed your cycle" dialog.
+  // Saved like a real cycle end, so it also survives a restart
+  void forceEndCycle() {
+    if (_avatar == null) return;
+    _cycle.forceComplete();
+    _changed();
+  }
+
+  // For demos and testing.
+  // Adds the growth AvatarSprites says is missing, so the avatar is maxed and
+  // Home shows the "maximum muscle growth" dialog. The growth is saved,
+  // so it also survives a restart
+  void forceMaxed() {
+    final current = _avatar;
+    if (current == null) return;
+    if (!_applyGrowth(AvatarSprites(current).growthToMax())) return;
+    _changed();
+  }
 
   // Writes only once: does nothing if an avatar already exists
   // Meant to be called once, when avatar creation is finished
@@ -172,11 +210,13 @@ class UserProfile extends ChangeNotifier {
     return template;
   }
 
-  // Saves the finished avatar as a record in history,
-  // then clears the avatar and resets the cycle
+  // Saves the finished avatar as a record in history, raises the ascension
+  // level by 1 (up to the max) for the next avatar, then clears the avatar
+  // and resets the cycle. Home calls it when canAscend is true
   void ascend() {
     final current = _avatar;
     if (current != null) {
+      if (_ascensionLevel < maxAscensionLevel) _ascensionLevel++;
       final now = DateTime.now();
       _history.add(
         AvatarRecord.finish(
@@ -211,6 +251,7 @@ class UserProfile extends ChangeNotifier {
           workoutHistory: List.of(_workoutHistory),
           templates: List.of(_templates),
           cycleStart: _cycle.cycleStart,
+          ascensionLevel: _ascensionLevel,
         ),
       );
     } catch (err) {

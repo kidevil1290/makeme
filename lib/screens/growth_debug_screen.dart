@@ -150,18 +150,6 @@ class _GrowthDebugScreenState extends State<GrowthDebugScreen> {
               Text('$_goal d/wk'),
             ],
           ),
-          Row(
-            children: [
-              const Expanded(child: Text('Only my build')),
-              Switch(
-                value: _myBuildOnly,
-                onChanged: (v) => _resimulate(() {
-                  _myBuildOnly = v;
-                  _day = _day.clamp(0, CycleManager.cycleDays);
-                }),
-              ),
-            ],
-          ),
         ],
       ),
     );

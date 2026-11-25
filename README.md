@@ -57,7 +57,7 @@ Saved in the browser where it is opened.
 Another browser starts empty
 
 ### Local Link
-Saved in the browser for the address localhost:8080.
+Saved in the browser for the address localhost:8080 (Windows) and 57100 (Mac).
 Another browser or another port starts empty.
 
 ### How To Reset Data
@@ -169,6 +169,8 @@ flutter test
 |-pubspec.yaml      dependency manager
 |-test/             unit tests                 
 ```
+## AI Disclosure
+AI tool, Claude, by Anthropic was used to clarify technical concepts that helped the team better understand and formulate system designs. It also assisted on debugging unfamiliar Dart or Flutter syntax, reducing the time required to resolve implementation issues. Additionally, scripts for automating the web build and application execution were generated to simplify access and facilitate project demonstration. 
 
 A few resources to get you started if this is your first Flutter project:
 
